@@ -1,24 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import {
+  ZapparCamera, InstantTracker, ZapparCanvas, BrowserCompatibility,
+} from '@zappar/zappar-react-three-fiber';
 
 function App() {
+  const [placementMode, setPlacementMode] = useState(true);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <BrowserCompatibility />
+      <ZapparCanvas>
+        <ZapparCamera />
+        <InstantTracker placementMode={placementMode} placementCameraOffset={[0, 0, -5]}>
+          <mesh>
+            <boxBufferGeometry />
+            <meshStandardMaterial color="hotpink" />
+          </mesh>
+        </InstantTracker>
+        <directionalLight position={[2.5, 8, 5]} intensity={1.5} />
+
+      </ZapparCanvas>
+      <div
+        id="zappar-button"
+        role="button"
+        onKeyPress={() => { setPlacementMode(((currentPlacementMode) => !currentPlacementMode)); }}
+        tabIndex={0}
+        onClick={() => { setPlacementMode(((currentPlacementMode) => !currentPlacementMode)); }}
+      >
+        Tap here to
+        {placementMode ? ' place ' : ' pick up '}
+        the object
+      </div>
+    </>
   );
 }
 
