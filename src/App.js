@@ -7,25 +7,48 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three'
 import glb from './assets/waving.glb'
+import gbl1 from './assets/old_rusty_car.glb'
+import gbl2 from './assets/male_person.glb'
+import gbl3 from './assets/the_big_g_building.glb'
 
 const Model = (props) => {
-  const clock = new THREE.Clock()
-  const gltf = useLoader(GLTFLoader, glb);
-  const mixer = new THREE.AnimationMixer(gltf.scene)
+  // const clock = new THREE.Clock()
+  console.log(props.model)
+  const gltf = useLoader(GLTFLoader, props.model);
+  // const mixer = new THREE.AnimationMixer(gltf.scene)
 
-  var action = mixer.clipAction(gltf.animations[0])
-  action.play()
+  // var action = mixer.clipAction(gltf.animations[0])
+  // action.play()
 
-  useFrame(() => mixer.update(clock.getDelta()))
+  // useFrame(() => mixer.update(clock.getDelta()))
 
   // console.log(gltf.animations)
-  return <primitive object={gltf.scene} />
+  return <primitive object={gltf.scene} scale={1} rotation={[0, 75 * Math.PI / 180, 0]} />
 }
 
 function App() {
+  // const gltf = useLoader(GLTFLoader, data);
+  const [data, setData] = useState(glb);
+
   const [placementMode, setPlacementMode] = useState(true);
   const [test, setTest] = useState(false);
   console.log(glb)
+
+  var url = 'https://api.sketchfab.com/v3/models/ba2b84dbcded4f309ad14f39e2c83932/download';
+  var options = {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${'zljrX7JwA8Qhcz3aUpfYpqj8XHgLW7'}`,
+    },
+    mode: 'cors'
+  };
+
+  fetch(url, options).then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    console.log(data);
+  });
+
 
   return (
     <>
@@ -43,7 +66,9 @@ function App() {
                 <tetrahedronGeometry />
                 <meshStandardMaterial color="hotpink" />
               </mesh> */}
-              <Model prueba={test} />
+              <Model prueba={test} model={data} />
+              {/* return <primitive object={gltf.scene} scale={0.1} rotation={[0, 75 * Math.PI / 180, 0]} /> */}
+
               {/* <primitive object={gltf.scene}/> */}
             </Float>
           </InstantTracker>
@@ -61,6 +86,13 @@ function App() {
         Tap here to
         {placementMode ? ' place ' : ' pick up '}
         the object
+      </div>
+      <div id="buton-change"
+        role='button'
+        tabIndex={0}
+        onClick={() => { setData(gbl2)}}
+      > 
+        Change Model
       </div>
     </>
   );
