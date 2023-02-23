@@ -21,7 +21,7 @@ function App() {
         <directionalLight position={[2.5, 8, 5]} intensity={1.5} />
       <Loader />
       </ZapparCanvas>
-      {/* <div
+      <div
         id="zappar-button"
         role="button"
         onKeyPress={() => { setPlacementMode(((currentPlacementMode) => !currentPlacementMode)); }}
@@ -31,7 +31,7 @@ function App() {
         Tap here to
         {placementMode ? ' place ' : ' pick up '}
         the object
-      </div> */}
+      </div>
     </>
   );
 }
