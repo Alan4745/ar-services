@@ -6,11 +6,16 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { useLoader } from '@react-three/fiber'
 import { Float } from '@react-three/drei';
 
+
+// const Model = () => {
+//   const clock = new THREE.Clock()
+//   const gltf = useLoader(GLTFLoader, './assets/waving.glb')
+
+// };
+
 function App() {
   const [placementMode, setPlacementMode] = useState(true);
-  // const gltf = useLoader(GLTFLoader, './assets/63e6a9496f759e4d1df93573.glb')
 
-  // console.log(gltf.scene)
   return (
     <>
       <BrowserCompatibility />
@@ -23,7 +28,17 @@ function App() {
               rotationIntensity={1} // XYZ rotation intensity, defaults to 1
               floatIntensity={1} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
             >
-              <mesh>
+              <mesh position={[0.90, 0, -0.50]}>
+                <tetrahedronGeometry />
+                <meshStandardMaterial color="hotpink" />
+              </mesh>
+            </Float>
+            <Float
+              speed={2} // Animation speed, defaults to 1
+              rotationIntensity={1} // XYZ rotation intensity, defaults to 1
+              floatIntensity={1} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+            >
+              <mesh position={[-0.90, 0, -0.50]}>
                 <tetrahedronGeometry />
                 <meshStandardMaterial color="hotpink" />
               </mesh>
