@@ -10,6 +10,7 @@ import glb from './assets/waving.glb'
 import gbl1 from './assets/old_rusty_car.glb'
 import gbl2 from './assets/male_person.glb'
 import gbl3 from './assets/the_big_g_building.glb'
+import gbl4 from './assets/cyberpunk_card.glb'
 
 const Model = (props) => {
   // const clock = new THREE.Clock()
@@ -23,7 +24,8 @@ const Model = (props) => {
   // useFrame(() => mixer.update(clock.getDelta()))
 
   // console.log(gltf.animations)
-  return <primitive object={gltf.scene} scale={1} rotation={[0, 75 * Math.PI / 180, 0]} />
+  console.log(props.size)
+  return <primitive object={gltf.scene} scale={props.size} position={props.posicion} rotation={[0, 0 * Math.PI / 180, 0]} />
 }
 
 function App() {
@@ -32,23 +34,42 @@ function App() {
 
   const [placementMode, setPlacementMode] = useState(true);
   const [test, setTest] = useState(false);
-  console.log(glb)
+  console.log(data)
 
-  var url = 'https://api.sketchfab.com/v3/models/ba2b84dbcded4f309ad14f39e2c83932/download';
-  var options = {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${'zljrX7JwA8Qhcz3aUpfYpqj8XHgLW7'}`,
-    },
-    mode: 'cors'
+  // var url = 'https://api.sketchfab.com/v3/models/90d980fb471f440aa1d16866c79c61f7/download';
+  // var options = {
+  //   method: 'GET',
+  //   headers: {
+  //     Authorization: `Bearer ${'zljrX7JwA8Qhcz3aUpfYpqj8XHgLW7'}`,
+  //   },
+  //   mode: 'cors'
+  // };
+
+  // fetch(url, options).then(function (response) {
+  //   return response.json();
+  // }).then(function (data) {
+  //   console.log(data);
+  // });
+
+
+  const [value, setValue] = useState(1); // Valor inicial del slider
+  const [ejeY, setEjeY] = useState([0, 0.50, 0]);
+
+
+
+
+  const handleChange = (event) => {
+    setValue(event.target.value); // Actualizar el valor del slider
   };
 
-  fetch(url, options).then(function (response) {
-    return response.json();
-  }).then(function (data) {
-    console.log(data);
-  });
+  const handleChange1 = (event) => {
+    // setEjeY(event.target.value); // Actualizar el valor del slider
+    const newArray = [...ejeY];
+    newArray[1] = event.target.value;
+    setEjeY(newArray);
 
+    console.log(newArray)
+  };
 
   return (
     <>
@@ -66,14 +87,14 @@ function App() {
                 <tetrahedronGeometry />
                 <meshStandardMaterial color="hotpink" />
               </mesh> */}
-              <Model prueba={test} model={data} />
+              <Model prueba={test} model={data} size={value} posicion={ejeY} />
               {/* return <primitive object={gltf.scene} scale={0.1} rotation={[0, 75 * Math.PI / 180, 0]} /> */}
 
               {/* <primitive object={gltf.scene}/> */}
             </Float>
           </InstantTracker>
         </Suspense>
-        <directionalLight position={[2.5, 8, 5]} intensity={1.5} />
+        <directionalLight position={[1, 1, 5]} intensity={2} />
         <Loader />
       </ZapparCanvas>
       <div
@@ -90,9 +111,15 @@ function App() {
       <div id="buton-change"
         role='button'
         tabIndex={0}
-        onClick={() => { setData(gbl2)}}
-      > 
+        onClick={() => { data !== 'gbl4' ? setData(gbl4) : setData(gbl3) }}
+      >
         Change Model
+      </div>
+      <div id="change_size">
+        <input type="range" min="0" max="5" step="0.01" value={value} onChange={handleChange} />
+      </div>
+      <div id="change_posicion">
+        <input type="range" min="-5" max="5" step="0.01" value={ejeY[1]} onChange={handleChange1} />
       </div>
     </>
   );
