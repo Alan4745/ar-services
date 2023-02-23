@@ -26,20 +26,20 @@ body,
 #buton-change {
   position: absolute;
     bottom: 75px;
-    width: 200px;
-    left: calc(50% - 100px);
+    width: 100%;
+    /* left: calc(50% - 100px); */
     z-index: 1000;
     background-color: rgba(0, 0, 0, 0.8);
     color: white;
     text-align: center;
     font-family: sans-serif;
-    padding: 10px;
+    /* padding: 10px; */
     border-radius: 5px;
 }
 
 #change_size {
     position: absolute;
-      bottom: 125px;
+      bottom: 150px;
       width: 200px;
       left: calc(50% - 100px);
       z-index: 1000;
@@ -53,7 +53,7 @@ body,
 
 #change_posicion {
       position: absolute;
-        bottom: 175px;
+        bottom: 200px;
         width: 200px;
         left: calc(50% - 100px);
         z-index: 1000;

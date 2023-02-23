@@ -111,9 +111,21 @@ function App() {
       <div id="buton-change"
         role='button'
         tabIndex={0}
-        onClick={() => { data !== 'gbl4' ? setData(gbl4) : setData(gbl3) }}
+      // onClick={() => { data !== 'gbl4' ? setData(gbl4) : setData(gbl3) }}
       >
-        Change Model
+        <button style={{ width: '50%' }} onClick={() => { setData(gbl1)}}>
+          model 1
+        </button>
+        <button style={{ width: '50%' }} onClick={() => { setData(gbl2) }}>
+          model 2
+        </button>
+        <button style={{ width: '50%' }} onClick={() => { setData(gbl3) }}>
+          model 3
+        </button>
+        <button style={{ width: '50%' }} onClick={() => { setData(gbl4) }}>
+          model 4
+        </button>
+
       </div>
       <div id="change_size">
         <input type="range" min="0" max="5" step="0.01" value={value} onChange={handleChange} />
