@@ -13,27 +13,13 @@ import Model from './Model';
 export default function Ar(props) {
 
     // const gltf = useLoader(GLTFLoader, data);
-    const [data, setData] = useState(props.url);
+    const [data, setData] = useState(glb);
 
     const [placementMode, setPlacementMode] = useState(true);
     const [test, setTest] = useState(false);
     console.log(data)
 
-    // var url = 'https://api.sketchfab.com/v3/models/90d980fb471f440aa1d16866c79c61f7/download';
-    // var options = {
-    //   method: 'GET',
-    //   headers: {
-    //     Authorization: `Bearer ${'zljrX7JwA8Qhcz3aUpfYpqj8XHgLW7'}`,
-    //   },
-    //   mode: 'cors'
-    // };
-
-    // fetch(url, options).then(function (response) {
-    //   return response.json();
-    // }).then(function (data) {
-    //   console.log(data);
-    // });
-
+    console.log(props.url);
 
     const [value, setValue] = useState(1); // Valor inicial del slider
     const [ejeY, setEjeY] = useState([0, 0.50, 0]);
@@ -67,7 +53,7 @@ export default function Ar(props) {
                     <tetrahedronGeometry />
                     <meshStandardMaterial color="hotpink" />
                   </mesh> */}
-                            <Model prueba={test} model={data} size={value} posicion={ejeY} />
+                            <Model prueba={test} model={props.url} size={value} posicion={ejeY} />
                             {/* return <primitive object={gltf.scene} scale={0.1} rotation={[0, 75 * Math.PI / 180, 0]} /> */}
 
                             {/* <primitive object={gltf.scene}/> */}
@@ -109,9 +95,11 @@ export default function Ar(props) {
             </div>
             <div id="change_size">
                 <input type="range" min="0" max="5" step="0.01" value={value} onChange={handleChange} />
+                <label>{value}</label>
             </div>
             <div id="change_posicion">
                 <input type="range" min="-5" max="5" step="0.01" value={ejeY[1]} onChange={handleChange1} />
+                <label>{ejeY[1]}</label>
             </div>
         </>
     );
