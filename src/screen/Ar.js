@@ -16,13 +16,16 @@ export default function Ar(props) {
     const [data, setData] = useState(glb);
 
     const [placementMode, setPlacementMode] = useState(true);
-    const [test, setTest] = useState(false);
-    console.log(data)
-
-    console.log(props.url);
+    const [modelUrls, setModelUrls] = useState([
+        { url: gbl4 },
+        { url: '/path/to/model2.gltf' },
+        { url: '/path/to/model3.gltf' },
+    ]);
 
     const [value, setValue] = useState(1); // Valor inicial del slider
     const [ejeY, setEjeY] = useState([0, 0.50, 0]);
+    const [rotacion, setRotacion] = useState(0);
+    const [size1, setSize1] = useState(1);
 
     const handleChange = (event) => {
         setValue(event.target.value); // Actualizar el valor del slider
@@ -37,6 +40,15 @@ export default function Ar(props) {
         console.log(newArray)
     };
 
+    const handleChange2 = (event) => {
+        setRotacion(event.target.value); // Actualizar el valor del slider
+    };
+
+    
+    const handleChange3 = (event) => {
+        setSize1(event.target.value); // Actualizar el valor del slider
+    };
+
     return (
         <>
             <BrowserCompatibility />
@@ -49,18 +61,12 @@ export default function Ar(props) {
                             rotationIntensity={1} // XYZ rotation intensity, defaults to 1
                             floatIntensity={1} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
                         >
-                            {/* <mesh>
-                    <tetrahedronGeometry />
-                    <meshStandardMaterial color="hotpink" />
-                  </mesh> */}
-                            <Model prueba={test} model={props.url} size={value} posicion={ejeY} />
-                            {/* return <primitive object={gltf.scene} scale={0.1} rotation={[0, 75 * Math.PI / 180, 0]} /> */}
+                            <Model model={props.url} size={size1} posicion={ejeY} rotation={rotacion} />
 
-                            {/* <primitive object={gltf.scene}/> */}
                         </Float>
                     </InstantTracker>
                 </Suspense>
-                <directionalLight position={[1, 1, 5]} intensity={2} />
+                <directionalLight position={[2.5, 8, 5]} intensity={1.5} />
                 <Loader />
             </ZapparCanvas>
             <div
@@ -74,7 +80,7 @@ export default function Ar(props) {
                 {placementMode ? ' place ' : ' pick up '}
                 the object
             </div>
-            <div id="buton-change"
+            {/* <div id="buton-change"
                 role='button'
                 tabIndex={0}
             // onClick={() => { data !== 'gbl4' ? setData(gbl4) : setData(gbl3) }}
@@ -92,14 +98,18 @@ export default function Ar(props) {
                     model 4
                 </button>
 
-            </div>
+            </div> */}
             <div id="change_size">
-                <input type="range" min="0" max="5" step="0.01" value={value} onChange={handleChange} />
-                <label>{value}</label>
+                <input type="range" min="0" max="360" value={rotacion} onChange={handleChange2} />
+                <label>rotation: {rotacion}</label>
             </div>
-            <div id="change_posicion">
+            {/* <div id="change_posicion">
                 <input type="range" min="-5" max="5" step="0.01" value={ejeY[1]} onChange={handleChange1} />
-                <label>{ejeY[1]}</label>
+                <label>ejeY: {ejeY[1]}</label>
+            </div> */}
+            <div id="change_rotacion">
+                <input type="range" min="0" max="5" step="0.01" value={size1} onChange={handleChange3} />
+                <label>size: {size1}</label>
             </div>
         </>
     );
