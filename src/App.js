@@ -28,11 +28,6 @@ function App() {
     }
   };
 
-  const CLIENT_ID = "vagG6eINsnorKHmdlGd4iUbs2kiGvlULCKsclozk";
-  const AUTHENTICATION_URL = `https://sketchfab.com/oauth2/authorize/?state=123456789&response_type=token&client_id=${CLIENT_ID}`;
-
-  window.open(AUTHENTICATION_URL);
-
   return (
     <>
       {!modelCargado ? (
