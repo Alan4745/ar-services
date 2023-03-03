@@ -1,0 +1,16 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-landmark-dev-204129-authRole",
+      "UnauthRoleArn": "arn:aws:iam::048453839742:role/amplify-landmark-dev-204129-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::048453839742:role/amplify-landmark-dev-204129-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-landmark-dev-204129-deployment",
+      "UnauthRoleName": "amplify-landmark-dev-204129-unauthRole",
+      "StackName": "amplify-landmark-dev-204129",
+      "StackId": "arn:aws:cloudformation:ca-central-1:048453839742:stack/amplify-landmark-dev-204129/5d0dbc80-458d-11ed-8326-063541658de4",
+      "AmplifyAppId": "dx5afhxt3nqu9",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-landmark-dev-204129-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+    }
+  }
+}

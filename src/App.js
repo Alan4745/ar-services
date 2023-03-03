@@ -1,56 +1,53 @@
-import axios from "axios";
-import React, { Suspense, useState } from "react";
-import { deleteFile, uploadFile } from "./firebase/config";
-import Ar from "./screen/Ar";
-import Model from "./screen/Model";
+// import React, { Component } from "react";
+import SignInScreen from "./screens/login-signup/SignInScreen";
+import SignUpScreen from "./screens/login-signup/SignUpScreen";
+import ForgotPasswordScreen from "./screens/login-signup/ForgotPasswordScreen";
+import BottomNavBar from "./components/BottomNavBar";
+import { Routes, Route } from "react-router-dom";
+// import awsmobile from "./aws-exports";
+import { Storage } from "aws-amplify";
+import ConfirmSignUp from "./screens/login-signup/ConfirmSignUp";
+import ForgotPasswordSubmitScreen from "./screens/login-signup/ForgotPasswordSubmitScreen";
+import { useState } from "react";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import UserProfile from "./screens/more-tab/UserProfile";
+import SplashScreen from "./screens/SplashScreen";
+import OnBoardingScreen from "./screens/OnboardingScreen";
+import SuccessScreen from "./screens/SuccessScreen";
+import AR from "./screens/ar-screens/AR";
+// Storage.configure(awsmobile);
 
-function App() {
-  const [file, setFile] = useState(null);
-  const [urlfile, setUrlFile] = useState(null);
-  const [path, setPath] = useState(null);
-  const [modelCargado, setModelCargado] = useState(false);
-
-  const handleSumit = async (e) => {
-    e.preventDefault();
-    console.log("subiendo archivo");
-    // const result = await uploadFile(file)
-    // console.log(result)
-
-    try {
-      const result = await uploadFile(file);
-      console.log(result.url);
-      console.log(result.metaData.fullPath);
-      setUrlFile(result.url);
-      setPath(result.metaData.fullPath);
-      setModelCargado(true);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
+const App = () => {
+  const [jwt, setJwt] = useState(localStorage.getItem("userJwt"));
+  const [loggedIn, setIsLoggedIn] = useState(jwt ? true : false);
   return (
-    <>
-      {!modelCargado ? (
-        <div>
-          <h1>Estamos en la pantalla de inicio</h1>
-          <form onSubmit={handleSumit}>
-            <input
-              type="file"
-              name=""
-              id=""
-              onChange={(e) => setFile(e.target.files[0])}
-            />
-            <button>upload</button>
-          </form>
-          {/* <button onClick={() => { deleteFile('4d0bf7e3-7314-42c0-8e16-83c918d656b4.glb') }}>Delete</button> */}
-        </div>
-      ) : (
-        <>
-          <Ar url={urlfile} />
-        </>
-      )}
-    </>
+    <Routes>
+      <Route element={<ProtectedRoute routeType={1} loggedIn={loggedIn} />}>
+        <Route path="/" element={<SplashScreen />} />
+        <Route path="/onBoarding" element={<OnBoardingScreen />} />
+        <Route
+          path="/signIn"
+          element={<SignInScreen setIsLoggedIn={setIsLoggedIn} />}
+        />
+        <Route path="/signUp" element={<SignUpScreen />} />
+        <Route path="/forgotpassword" element={<ForgotPasswordScreen />} />
+        <Route
+          path="/forgotpasswordsubmit"
+          element={<ForgotPasswordSubmitScreen />}
+        />
+        <Route path="/success" element={<SuccessScreen />} />
+        {/* <Route path="/confirmSignUp" element={<ConfirmSignUp />} /> */}
+      </Route>
+      <Route element={<ProtectedRoute routeType={2} loggedIn={loggedIn} />}>
+        <Route element={<UserProfile />} />
+        <Route
+          path="/welcome"
+          element={<BottomNavBar setIsLoggedIn={setIsLoggedIn} />}
+        />
+        <Route path="/test/:id" element={<AR />} />
+      </Route>
+    </Routes>
   );
-}
+};
 
 export default App;
