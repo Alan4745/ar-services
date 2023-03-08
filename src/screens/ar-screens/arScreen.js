@@ -72,7 +72,7 @@ const ArScreen = ({ setValue }) => {
               ))}
             </>
           ) : (
-            <h1>Crear tu primera experencia</h1>
+            <h1>Create your first AR experience</h1>
           )}
         </div>
       </Background>

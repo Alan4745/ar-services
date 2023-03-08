@@ -12,6 +12,7 @@ import Model3d from "./Model3d";
 function AR() {
   let { id } = useParams();
   const [configAr, setConfigAr] = useState({});
+  const [startCam, setStartCam] = useState(true);
 
   useEffect(() => {
     const loadConfigAr = async () => {
@@ -22,15 +23,30 @@ function AR() {
     loadConfigAr();
   }, []);
 
-  console.log(id);
+  useEffect(() => {
+    // Inicializa la cámara de Zapper
+    setStartCam(true);
+    // Retorna una función que se llama cuando el componente se destruye
+    return () => {
+      setStartCam(false);
+      console.log("estamos destrullendo el componente");
+      console.log(startCam);
+      // Detiene la cámara de Zapper
+    };
+  }, []);
 
+  console.log(configAr.urlModel);
   const [placementMode, setPlacementMode] = useState(true);
 
   return (
     <div style={{ backgroundColor: "#000", height: "100vh", width: "100%" }}>
       <BrowserCompatibility />
       <ZapparCanvas>
-        <ZapparCamera />
+        <ZapparCamera start={startCam} />
+        <ambientLight intensity={1} />
+
+        <directionalLight position={[0, 2, 2]} />
+        <directionalLight position={[0, 2, -2]} />
         <Suspense fallback={null}>
           <InstantTracker
             placementMode={placementMode}
@@ -47,9 +63,14 @@ function AR() {
             {configAr.urlModel !== undefined ? (
               <Model3d model={configAr.urlModel} />
             ) : null}
+            {/* <Model3d model={configAr.urlModel} /> */}
+            {/* 
+            <mesh>
+              <boxBufferGeometry />
+              <meshStandardMaterial color="hotpink" />
+            </mesh> */}
           </InstantTracker>
         </Suspense>
-        <directionalLight position={[2.5, 8, 5]} intensity={1.5} />
         {/* <Loader /> */}
       </ZapparCanvas>
       <button

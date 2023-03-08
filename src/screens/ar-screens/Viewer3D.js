@@ -16,6 +16,8 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
 import Button from "@mui/material/Button";
 import { uploadFile, deleteFile } from "../../API/firebase/config";
+import Model3d from "./Model3d";
+import { SaveModel3D } from "../../API/ArServiceApis";
 
 const Model3D = (props) => {
   const gltf = useLoader(GLTFLoader, props.model3D);
@@ -67,7 +69,11 @@ const Model3D = (props) => {
 const Loader = () => {
   const { progress } = useProgress();
   console.log(progress);
-  return <Html center>{progress} % loaded</Html>;
+  return (
+    <Html center style={{ color: "#FFFFFF" }}>
+      {progress} % loaded
+    </Html>
+  );
 };
 
 const Viewer3D = () => {
@@ -84,9 +90,11 @@ const Viewer3D = () => {
   const [save, setSave] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showPorcet, setShowPorcet] = useState(false);
+  const [rotation, setrotation] = useState([0, 0, 0]);
 
   const handleSumit = async (e) => {
     setDisable(true);
+    setShowPorcet(true);
     e.preventDefault();
     console.log("subiendo archivo");
 
@@ -99,20 +107,30 @@ const Viewer3D = () => {
       setPath(result.metaData.fullPath);
       setReplay(false);
       setSave(false);
+      setShowPorcet(false);
       setProgress(0);
     } catch (error) {
       console.log(error);
     }
   };
 
-  console.log(progress + "%");
-
   const handleChange3 = (event) => {
     setSize1(event.target.value); // Actualizar el valor del slider
   };
 
-  const uploadExpAr = () => {
+  const submitExpAr = async () => {
     console.log("Estamos subiendo los datos a la base de datos");
+
+    const result = await SaveModel3D(
+      urlfile,
+      path,
+      size1,
+      rotation[0],
+      rotation[1],
+      rotation[2]
+    );
+
+    console.log(result);
   };
 
   const rebootSetting = async () => {
@@ -136,7 +154,7 @@ const Viewer3D = () => {
   return (
     <>
       <div style={style.container}>
-        <Canvas camera={{ position: [0, 2.5, 3] }}>
+        <Canvas camera={{ position: [1, 1.5, 1] }}>
           {/* <Sky azimuth={1} inclination={0.6} distance={1000} /> */}
           <ambientLight intensity={1} />
 
@@ -144,7 +162,8 @@ const Viewer3D = () => {
           <directionalLight position={[0, 2, -2]} />
 
           <Suspense fallback={<Loader />}>
-            <Model3D model3D={urlfile} size={size1} />
+            {/* <Model3D model3D={urlfile} size={size1} /> */}
+            <Model3d model={urlfile} size={size1} />
 
             <OrbitControls />
           </Suspense>
@@ -167,7 +186,13 @@ const Viewer3D = () => {
             disabled={disable}
             endIcon={<DriveFolderUploadIcon />}
           >
-            {showPorcet ? <>uploading {progress}</> : <> Upload File</>}
+            {showPorcet ? (
+              <div style={{ color: "#FF0000" }}>
+                uploading {progress.toFixed(2)}%
+              </div>
+            ) : (
+              <> Upload File</>
+            )}
           </Button>
           <div style={style.containerButoon}>
             <Button
@@ -189,7 +214,7 @@ const Viewer3D = () => {
               color="success"
               endIcon={<SaveIcon />}
               onClick={() => {
-                uploadExpAr();
+                submitExpAr();
               }}
             >
               Save

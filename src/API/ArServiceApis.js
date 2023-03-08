@@ -13,15 +13,23 @@ export const SaveModel3D = async (
   rotationModelz
 ) => {
   try {
-    const response = await axios.post("/ar/savemodel3d", {
-      urlModel: urlModel,
-      bucketLocation: bucketLocation,
-      sizeModel: sizeModel,
-      rotationModelx: rotationModelx,
-      rotationModely: rotationModely,
-      rotationModelz: rotationModelz,
-    });
-    return response;
+    const response = await axiosAPI.post(
+      "/ar/savemodel3d",
+      {
+        urlModel: urlModel,
+        bucketLocation: bucketLocation,
+        sizeModel: sizeModel,
+        rotationModelx: rotationModelx,
+        rotationModely: rotationModely,
+        rotationModelz: rotationModelz,
+      },
+      {
+        headers: {
+          Authorization: localStorage.getItem("userJwt"),
+        },
+      }
+    );
+    return response.data;
   } catch (err) {
     console.log("Error al gaurdar AR");
   }
