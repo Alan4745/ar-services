@@ -49,8 +49,10 @@ function AR() {
         <directionalLight position={[0, 2, -2]} />
         <Suspense fallback={null}>
           <InstantTracker
-            placementMode={placementMode}
-            placementCameraOffset={[0, 0, -5]}
+            // placementMode={placementMode}
+            // placementCameraOffset={[0, 0, -5]}
+            placementUI="placement-only"
+            placementCameraOffset={[0, 0, -10]}
           >
             {/* <Model3d
               model={configAr.urlModel}
