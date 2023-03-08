@@ -15,6 +15,7 @@ import SplashScreen from "./screens/SplashScreen";
 import OnBoardingScreen from "./screens/OnboardingScreen";
 import SuccessScreen from "./screens/SuccessScreen";
 import AR from "./screens/ar-screens/AR";
+import Viewer3D from "./screens/ar-screens/Viewer3D";
 // Storage.configure(awsmobile);
 
 const App = () => {
@@ -45,6 +46,7 @@ const App = () => {
           element={<BottomNavBar setIsLoggedIn={setIsLoggedIn} />}
         />
         <Route path="/test/:id" element={<AR />} />
+        <Route path="/uploadExperianAr" element={<Viewer3D />} />
       </Route>
     </Routes>
   );
