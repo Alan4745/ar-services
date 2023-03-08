@@ -15,7 +15,7 @@ function Model3d(props) {
     sizeZ: size1.z,
   });
 
-  console.log(props.model);
+  console.log(props.model, box);
 
   useEffect(() => {
     console.log("estamos dentro del useEffect 2");
@@ -25,10 +25,10 @@ function Model3d(props) {
       sizeY: size1.y,
       sizeZ: size1.z,
     });
-  }, [props.model, gltf]);
+  }, [props.model]);
 
   const scaleModel =
-    1 /
+    (1 * 2) /
     Math.max(sizeCordenadas.sizeX, sizeCordenadas.sizeY, sizeCordenadas.sizeZ);
   const SizeModel =
     scaleModel *
