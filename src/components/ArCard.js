@@ -46,7 +46,7 @@ function ArCard({ data }) {
             alignItems: "flex-start",
           }}
         >
-          <Typography variant="more_option_text">{data.nameAr}</Typography>
+          <Typography variant="more_option_text">{data._id}</Typography>
           {/* <Typography style={headingStyleSecondary}>{data.Category}</Typography> */}
         </div>
       </ImageNameContainer>

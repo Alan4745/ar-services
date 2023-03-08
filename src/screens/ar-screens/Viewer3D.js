@@ -18,6 +18,7 @@ import Button from "@mui/material/Button";
 import { uploadFile, deleteFile } from "../../API/firebase/config";
 import Model3d from "./Model3d";
 import { SaveModel3D } from "../../API/ArServiceApis";
+import { useNavigate } from "react-router-dom";
 
 const Model3D = (props) => {
   const gltf = useLoader(GLTFLoader, props.model3D);
@@ -77,6 +78,8 @@ const Loader = () => {
 };
 
 const Viewer3D = () => {
+  const navigate = useNavigate();
+
   const [file, setFile] = useState(null);
   const inputRef = createRef();
   const [disable, setDisable] = useState(false);
@@ -130,7 +133,8 @@ const Viewer3D = () => {
       rotation[2]
     );
 
-    console.log(result);
+    console.log(result.message._id);
+    navigate(`/test/${result.message._id}`);
   };
 
   const rebootSetting = async () => {
@@ -156,10 +160,12 @@ const Viewer3D = () => {
       <div style={style.container}>
         <Canvas camera={{ position: [1, 1.5, 1] }}>
           {/* <Sky azimuth={1} inclination={0.6} distance={1000} /> */}
-          <ambientLight intensity={1} />
+          <ambientLight intensity={0.1} />
 
-          <directionalLight position={[0, 2, 2]} />
-          <directionalLight position={[0, 2, -2]} />
+          <directionalLight intensity={1} position={[0, 0.5, 2]} />
+          <directionalLight intensity={1} position={[0, 0.5, -2]} />
+          <directionalLight intensity={1} position={[0, -0.5, -2]} />
+          <directionalLight intensity={1} position={[0, -0.5, 2]} />
 
           <Suspense fallback={<Loader />}>
             {/* <Model3D model3D={urlfile} size={size1} /> */}
