@@ -49,10 +49,10 @@ function AR() {
         <directionalLight position={[0, 2, -2]} />
         <Suspense fallback={null}>
           <InstantTracker
-            // placementMode={placementMode}
+            placementMode={placementMode}
+            placementCameraOffset={[0, 0, -5]}
+            // placementUI="placement-only"
             // placementCameraOffset={[0, 0, -5]}
-            placementUI="placement-only"
-            placementCameraOffset={[0, 0, -10]}
           >
             {/* <Model3d
               model={configAr.urlModel}
@@ -75,7 +75,7 @@ function AR() {
         </Suspense>
         {/* <Loader /> */}
       </ZapparCanvas>
-      <button
+      {/* <button
         style={{
           position: "absolute",
           bottom: "30px",
@@ -87,7 +87,17 @@ function AR() {
         }}
       >
         back
-      </button>
+      </button> */}
+      <div
+        id="zappar-placement-ui"
+        onClick={() => {
+          setPlacementMode((currentPlacementMode) => !currentPlacementMode);
+        }}
+      >
+        Tap here to
+        {placementMode ? " place " : " pick up "}
+        the object
+      </div>
     </div>
   );
 }
