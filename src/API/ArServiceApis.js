@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosAPI = axios.create({
-  baseURL: "http://localhost:4848/",
+  baseURL: "https://arservice.onrender.com",
 });
 
 export const SaveModel3D = async (
