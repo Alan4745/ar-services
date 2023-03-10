@@ -21,48 +21,32 @@ import { SaveModel3D } from "../../API/ArServiceApis";
 import { useNavigate } from "react-router-dom";
 
 const Model3D = (props) => {
-  const gltf = useLoader(GLTFLoader, props.model3D);
-  const [animation1, setAnimation1] = useState(false);
-  var box = new THREE.Box3().setFromObject(gltf.scene);
-  var size1 = new THREE.Vector3();
-  box.getSize(size1);
+  const gltf = useLoader(GLTFLoader, props.model);
+  let box = new THREE.Box3().setFromObject(gltf.scene);
+  let size = new THREE.Vector3();
+  box.getSize(size);
 
-  const [test, setTest] = useState({
-    sizeX: size1.x,
-    sizeY: size1.y,
-    sizeZ: size1.z,
+  const [sizeXYZ, setSizeXYZ] = useState({
+    sizeX: size.x,
+    sizeY: size.y,
+    sizeZ: size.z,
   });
 
   useEffect(() => {
-    // console.log("estamos dentro del useEffect");
-    // console.log(size1);
-    setTest({
-      sizeX: size1.x,
-      sizeY: size1.y,
-      sizeZ: size1.z,
+    setSizeXYZ({
+      sizeX: size.x,
+      sizeY: size.y,
+      sizeZ: size.z,
     });
-  }, [props.model3D]);
+  }, [props.model]);
 
-  // console.log(props.model3D);
+  const scaleModel = 1 / Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
+  const sizeModel =
+    scaleModel * Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
 
-  // if (gltf.animations.length !== 0) {
-  //   const clock = new THREE.Clock();
-  //   const mixer = new THREE.AnimationMixer(gltf.scene);
-  //   var action = mixer.clipAction(gltf.animations[0]);
-  //   action.play();
-  //   useFrame(() => mixer.update(clock.getDelta()));
-  // }
+  console.log(scaleModel, "scaleModel");
 
-  const sizeTime =
-    (props.size * 2) / Math.max(test.sizeX, test.sizeY, test.sizeZ);
-
-  const test4 = sizeTime * Math.max(test.sizeX, test.sizeY, test.sizeZ);
-
-  // console.log(sizeTime, "size de 1");
-
-  // console.log(test4, "size normal");
-
-  gltf.scene.scale.set(sizeTime, sizeTime, sizeTime);
+  gltf.scene.scale.set(scaleModel, scaleModel, scaleModel);
 
   return <primitive object={gltf.scene} />;
 };
@@ -94,6 +78,8 @@ const Viewer3D = () => {
   const [progress, setProgress] = useState(0);
   const [showPorcet, setShowPorcet] = useState(false);
   const [rotation, setrotation] = useState([0, 0, 0]);
+  const controlsRef = useRef();
+  const [initialPosition, setInitialPosition] = useState([1, 1.5, 1]);
 
   const handleSumit = async (e) => {
     setDisable(true);
@@ -112,6 +98,7 @@ const Viewer3D = () => {
       setSave(false);
       setShowPorcet(false);
       setProgress(0);
+      handleReset();
     } catch (error) {
       console.log(error);
     }
@@ -149,10 +136,18 @@ const Viewer3D = () => {
       setReplay(true);
       setSave(true);
       inputRef.current.value = "";
+      handleReset();
       setUrlFile(`${modelDefault}?timestamp=${Date.now()}`);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleReset = () => {
+    const controls = controlsRef.current;
+    controls.reset();
+    controls.object.position.fromArray(initialPosition);
+    controls.update();
   };
 
   return (
@@ -168,10 +163,10 @@ const Viewer3D = () => {
           <directionalLight intensity={1} position={[0, -0.5, 2]} />
 
           <Suspense fallback={<Loader />}>
-            {/* <Model3D model3D={urlfile} size={size1} /> */}
-            <Model3d model={urlfile} size={size1} />
+            {/* <Model3d model={urlfile} size={size1} /> */}
+            <Model3D model={urlfile} size={size1} />
 
-            <OrbitControls />
+            <OrbitControls ref={controlsRef} />
           </Suspense>
         </Canvas>
       </div>

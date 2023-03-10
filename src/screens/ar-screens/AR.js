@@ -9,10 +9,11 @@ import {
   ZapparCanvas,
 } from "@zappar/zappar-react-three-fiber";
 import Model3d from "./Model3d";
+import { useRef } from "react";
 function AR() {
   let { id } = useParams();
   const [configAr, setConfigAr] = useState({});
-  const [startCam, setStartCam] = useState(true);
+  const [out, setOut] = useState(false);
 
   useEffect(() => {
     const loadConfigAr = async () => {
@@ -24,25 +25,31 @@ function AR() {
   }, []);
 
   useEffect(() => {
-    // Inicializa la cámara de Zapper
-    setStartCam(true);
-    // Retorna una función que se llama cuando el componente se destruye
     return () => {
-      setStartCam(false);
-      console.log("estamos destrullendo el componente");
-      console.log(startCam);
-      // Detiene la cámara de Zapper
+      if (cameraRef.current) {
+        cameraRef.current.camera.dispose(); // liberar los recursos asociados a la cámara
+      }
     };
   }, []);
 
   console.log(configAr.urlModel);
   const [placementMode, setPlacementMode] = useState(true);
 
+  const cameraRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (cameraRef.current) {
+        cameraRef.current.close(); // detener la captura de vídeo y liberar los recursos asociados al AR SDK
+      }
+    };
+  }, []);
+
   return (
     <div style={{ backgroundColor: "#000", height: "100vh", width: "100%" }}>
       <BrowserCompatibility />
       <ZapparCanvas>
-        <ZapparCamera start={startCam} />
+        <ZapparCamera />
         <ambientLight intensity={1} />
 
         <directionalLight position={[0, 2, 2]} />
@@ -51,45 +58,16 @@ function AR() {
           <InstantTracker
             placementMode={placementMode}
             placementCameraOffset={[0, 0, -5]}
-            // placementUI="placement-only"
-            // placementCameraOffset={[0, 0, -5]}
           >
-            {/* <Model3d
-              model={configAr.urlModel}
-              // size={size1}
-              // posicion={ejeY}
-              // rotation={rotacion}
-              // pathBucketModel={props.pathBucket}
-              // submit={onSubmit}
-            /> */}
             {configAr.urlModel !== undefined ? (
-              <Model3d model={configAr.urlModel} />
+              <Model3d model={configAr.urlModel} size={configAr.sizeModel} />
             ) : null}
-            {/* <Model3d model={configAr.urlModel} /> */}
-            {/* 
-            <mesh>
-              <boxBufferGeometry />
-              <meshStandardMaterial color="hotpink" />
-            </mesh> */}
           </InstantTracker>
         </Suspense>
-        {/* <Loader /> */}
       </ZapparCanvas>
-      {/* <button
-        style={{
-          position: "absolute",
-          bottom: "30px",
-          width: "200px",
-          left: "calc(50% - 100px)",
-        }}
-        onClick={() => {
-          Navigate(-1);
-        }}
-      >
-        back
-      </button> */}
       <div
         id="zappar-placement-ui"
+        style={style.zapparButton}
         onClick={() => {
           setPlacementMode((currentPlacementMode) => !currentPlacementMode);
         }}
@@ -101,5 +79,21 @@ function AR() {
     </div>
   );
 }
+
+const style = {
+  zapparButton: {
+    position: "absolute",
+    bottom: "30px",
+    width: "200px",
+    left: "calc(50% - 100px)",
+    zIndex: "1000",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    color: "white",
+    textAlign: "center",
+    fontFamily: "sans-serif",
+    padding: "10px",
+    borderRadius: "5px",
+  },
+};
 
 export default AR;

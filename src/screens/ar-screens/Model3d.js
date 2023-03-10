@@ -1,13 +1,19 @@
-import { useLoader } from "@react-three/fiber";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo, useRef } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 
 function Model3d(props) {
   const gltf = useLoader(GLTFLoader, props.model);
-  var box = new THREE.Box3().setFromObject(gltf.scene);
-  var size1 = new THREE.Vector3();
-  box.getSize(size1);
+
+  const boxRef = useRef(new THREE.Box3().setFromObject(gltf.scene));
+
+  useEffect(() => {
+    boxRef.current.setFromObject(gltf.scene);
+  }, [props.model]);
+
+  const size1 = new THREE.Vector3();
+  boxRef.current.getSize(size1);
 
   const [sizeCordenadas, setSizeCordenadas] = useState({
     sizeX: size1.x,
@@ -15,11 +21,7 @@ function Model3d(props) {
     sizeZ: size1.z,
   });
 
-  console.log(props.model, box);
-
   useEffect(() => {
-    console.log("estamos dentro del useEffect 2");
-    // console.log(size1);
     setSizeCordenadas({
       sizeX: size1.x,
       sizeY: size1.y,
@@ -28,20 +30,24 @@ function Model3d(props) {
   }, [props.model]);
 
   const scaleModel =
-    (1 * 2) /
-    Math.max(sizeCordenadas.sizeX, sizeCordenadas.sizeY, sizeCordenadas.sizeZ);
-  const SizeModel =
-    scaleModel *
+    props.size /
     Math.max(sizeCordenadas.sizeX, sizeCordenadas.sizeY, sizeCordenadas.sizeZ);
 
-  // console.log(scaleModel, "size de 1");
-  // console.log(SizeModel, "size normal");
+  // const SizeModel =
+  //   scaleModel *
+  //   Math.max(sizeCordenadas.sizeX, sizeCordenadas.sizeY, sizeCordenadas.sizeZ);
 
-  gltf.scene.scale.set(scaleModel, scaleModel, scaleModel);
+  // console.log(SizeModel, "SizeModel");
 
-  console.log(scaleModel);
+  console.log(scaleModel, "scaleModel");
 
-  return <primitive object={gltf.scene} />;
+  return (
+    <primitive
+      object={gltf.scene}
+      scale={scaleModel}
+      rotation={[0, (90 * Math.PI) / 180, 0]}
+    />
+  );
 }
 
-export default Model3d;
+export default memo(Model3d);
