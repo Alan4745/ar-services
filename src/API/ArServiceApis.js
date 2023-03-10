@@ -1,13 +1,14 @@
 import axios from "axios";
 
 const axiosAPI = axios.create({
-  baseURL: "https://arservice.onrender.com",
+  baseURL: "http://localhost:4848/",
 });
 
 export const SaveModel3D = async (
   urlModel,
   bucketLocation,
   sizeModel,
+  scaleModel,
   rotationModelx,
   rotationModely,
   rotationModelz
@@ -19,6 +20,7 @@ export const SaveModel3D = async (
         urlModel: urlModel,
         bucketLocation: bucketLocation,
         sizeModel: sizeModel,
+        scaleModel: scaleModel,
         rotationModelx: rotationModelx,
         rotationModely: rotationModely,
         rotationModelz: rotationModelz,

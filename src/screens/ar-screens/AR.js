@@ -18,7 +18,7 @@ function AR() {
   useEffect(() => {
     const loadConfigAr = async () => {
       const ar = await getIdModelConfig(id);
-      console.log(ar.message);
+      // console.log(ar.message);
       setConfigAr(ar.message);
     };
     loadConfigAr();
@@ -32,7 +32,7 @@ function AR() {
     };
   }, []);
 
-  console.log(configAr.urlModel);
+  // console.log(configAr.urlModel);
   const [placementMode, setPlacementMode] = useState(true);
 
   const cameraRef = useRef(null);
@@ -60,7 +60,11 @@ function AR() {
             placementCameraOffset={[0, 0, -5]}
           >
             {configAr.urlModel !== undefined ? (
-              <Model3d model={configAr.urlModel} size={configAr.sizeModel} />
+              <Model3d
+                model={configAr.urlModel}
+                size={configAr.sizeModel}
+                scale1={configAr.scaleModel}
+              />
             ) : null}
           </InstantTracker>
         </Suspense>

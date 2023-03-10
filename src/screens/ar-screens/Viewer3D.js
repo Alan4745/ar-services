@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import {
   Circle,
@@ -22,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 
 const Model3D = (props) => {
   const gltf = useLoader(GLTFLoader, props.model);
+  const navigate = useNavigate();
   let box = new THREE.Box3().setFromObject(gltf.scene);
   let size = new THREE.Vector3();
   box.getSize(size);
@@ -31,6 +33,10 @@ const Model3D = (props) => {
     sizeY: size.y,
     sizeZ: size.z,
   });
+  const [sizeDb, setSizeDb] = useState(1);
+  const [escaleDb, setEscaleDb] = useState(1);
+  const [rotacion, setRotacion] = useState([0, 0, 0]);
+  const [position1, setPosition1] = useState([0, 0, 0]);
 
   useEffect(() => {
     setSizeXYZ({
@@ -40,15 +46,40 @@ const Model3D = (props) => {
     });
   }, [props.model]);
 
-  const scaleModel = 1 / Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
-  const sizeModel =
-    scaleModel * Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
+  useEffect(() => {
+    const submitExpAr = async () => {
+      console.log("Estamos subiendo los datos a la base de datos");
 
-  console.log(scaleModel, "scaleModel");
+      const result = await SaveModel3D(
+        props.model,
+        props.path,
+        sizeDb * 2,
+        escaleDb * 2,
+        rotacion[0],
+        rotacion[1],
+        rotacion[2]
+      );
+      console.log(result);
+      console.log(result.message._id);
+      navigate(`/test/${result.message._id}`);
+    };
 
-  gltf.scene.scale.set(scaleModel, scaleModel, scaleModel);
+    if (props.upExp) {
+      console.log("Estamos subiendo a la base de datos");
+      submitExpAr();
+    }
+    setEscaleDb(scaleModel1);
+    setSizeDb(sizeModel1);
+  }, [props.upExp, size]);
 
-  return <primitive object={gltf.scene} />;
+  const scaleModel1 = 1 / Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
+
+  const sizeModel1 =
+    scaleModel1 * Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
+  console.log(scaleModel1, "scaleModel");
+  console.log(sizeModel1, "sizeModel1");
+
+  return <primitive scale={scaleModel1} object={gltf.scene} />;
 };
 
 const Loader = () => {
@@ -62,8 +93,6 @@ const Loader = () => {
 };
 
 const Viewer3D = () => {
-  const navigate = useNavigate();
-
   const [file, setFile] = useState(null);
   const inputRef = createRef();
   const [disable, setDisable] = useState(false);
@@ -77,9 +106,9 @@ const Viewer3D = () => {
   const [save, setSave] = useState(true);
   const [progress, setProgress] = useState(0);
   const [showPorcet, setShowPorcet] = useState(false);
-  const [rotation, setrotation] = useState([0, 0, 0]);
   const controlsRef = useRef();
   const [initialPosition, setInitialPosition] = useState([1, 1.5, 1]);
+  const [upLoadExp, setupLoadExp] = useState(false);
 
   const handleSumit = async (e) => {
     setDisable(true);
@@ -106,22 +135,6 @@ const Viewer3D = () => {
 
   const handleChange3 = (event) => {
     setSize1(event.target.value); // Actualizar el valor del slider
-  };
-
-  const submitExpAr = async () => {
-    console.log("Estamos subiendo los datos a la base de datos");
-
-    const result = await SaveModel3D(
-      urlfile,
-      path,
-      size1,
-      rotation[0],
-      rotation[1],
-      rotation[2]
-    );
-
-    console.log(result.message._id);
-    navigate(`/test/${result.message._id}`);
   };
 
   const rebootSetting = async () => {
@@ -157,14 +170,23 @@ const Viewer3D = () => {
           {/* <Sky azimuth={1} inclination={0.6} distance={1000} /> */}
           <ambientLight intensity={0.1} />
 
-          <directionalLight intensity={1} position={[0, 0.5, 2]} />
-          <directionalLight intensity={1} position={[0, 0.5, -2]} />
-          <directionalLight intensity={1} position={[0, -0.5, -2]} />
-          <directionalLight intensity={1} position={[0, -0.5, 2]} />
+          <directionalLight intensity={0.5} position={[0, 0.5, 2]} />
+          <directionalLight intensity={0.5} position={[-1, 0.5, 1]} />
+          <directionalLight intensity={0.5} position={[1, 0.5, 1]} />
+          <directionalLight intensity={0.5} position={[2, 0.5, 0]} />
+          <directionalLight intensity={0.5} position={[-2, 0.5, 0]} />
+          <directionalLight intensity={0.5} position={[0, 0.5, -2]} />
+          <directionalLight intensity={0.5} position={[1, 0.5, 1]} />
+          <directionalLight intensity={0.5} position={[-1, 0.5, -1]} />
 
           <Suspense fallback={<Loader />}>
             {/* <Model3d model={urlfile} size={size1} /> */}
-            <Model3D model={urlfile} size={size1} />
+            <Model3D
+              model={urlfile}
+              path={path}
+              size={size1}
+              upExp={upLoadExp}
+            />
 
             <OrbitControls ref={controlsRef} />
           </Suspense>
@@ -215,7 +237,7 @@ const Viewer3D = () => {
               color="success"
               endIcon={<SaveIcon />}
               onClick={() => {
-                submitExpAr();
+                setupLoadExp(true);
               }}
             >
               Save
