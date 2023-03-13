@@ -24,23 +24,17 @@ function AR() {
     loadConfigAr();
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (cameraRef.current) {
-        cameraRef.current.camera.dispose(); // liberar los recursos asociados a la cámara
-      }
-    };
-  }, []);
-
   // console.log(configAr.urlModel);
   const [placementMode, setPlacementMode] = useState(true);
 
-  const cameraRef = useRef(null);
+  const camera = useRef();
+  console.log(camera);
 
   useEffect(() => {
     return () => {
-      if (cameraRef.current) {
-        cameraRef.current.close(); // detener la captura de vídeo y liberar los recursos asociados al AR SDK
+      console.log("estamos");
+      if (camera.current) {
+        camera.current.stop();
       }
     };
   }, []);
@@ -49,11 +43,11 @@ function AR() {
     <div style={{ backgroundColor: "#000", height: "100vh", width: "100%" }}>
       <BrowserCompatibility />
       <ZapparCanvas>
-        <ZapparCamera />
         <ambientLight intensity={1} />
-
         <directionalLight position={[0, 2, 2]} />
         <directionalLight position={[0, 2, -2]} />
+
+        <ZapparCamera ref={camera} />
         <Suspense fallback={null}>
           <InstantTracker
             placementMode={placementMode}
@@ -68,6 +62,7 @@ function AR() {
             ) : null}
           </InstantTracker>
         </Suspense>
+        <Loader />
       </ZapparCanvas>
       <div
         id="zappar-placement-ui"

@@ -5,6 +5,7 @@ import {
   Html,
   OrbitControls,
   Sky,
+  useCursor,
   useProgress,
 } from "@react-three/drei";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
@@ -17,7 +18,6 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
 import Button from "@mui/material/Button";
 import { uploadFile, deleteFile } from "../../API/firebase/config";
-import Model3d from "./Model3d";
 import { SaveModel3D } from "../../API/ArServiceApis";
 import { useNavigate } from "react-router-dom";
 
@@ -37,6 +37,8 @@ const Model3D = (props) => {
   const [escaleDb, setEscaleDb] = useState(1);
   const [rotacion, setRotacion] = useState([0, 0, 0]);
   const [position1, setPosition1] = useState([0, 0, 0]);
+  const [hovered, setHover] = useState(false);
+  useCursor(hovered);
 
   useEffect(() => {
     setSizeXYZ({
@@ -76,15 +78,22 @@ const Model3D = (props) => {
 
   const sizeModel1 =
     scaleModel1 * Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
-  console.log(scaleModel1, "scaleModel");
-  console.log(sizeModel1, "sizeModel1");
 
-  return <primitive scale={scaleModel1} object={gltf.scene} />;
+  return (
+    <primitive
+      scale={scaleModel1}
+      object={gltf.scene}
+      onClick={() => {
+        console.log("Estamos tocando al modelo");
+      }}
+      onPointerOver={() => setHover(true)}
+      onPointerOut={() => setHover(false)}
+    />
+  );
 };
 
 const Loader = () => {
   const { progress } = useProgress();
-  console.log(progress);
   return (
     <Html center style={{ color: "#FFFFFF" }}>
       {progress} % loaded
@@ -118,9 +127,7 @@ const Viewer3D = () => {
 
     try {
       const result = await uploadFile(file, setProgress);
-      console.log(result);
-      console.log(result.url);
-      console.log(result.metaData.fullPath);
+
       setUrlFile(result.url);
       setPath(result.metaData.fullPath);
       setReplay(false);
