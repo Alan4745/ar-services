@@ -83,11 +83,14 @@ const Model3D = (props) => {
     <primitive
       scale={scaleModel1}
       object={gltf.scene}
-      onClick={() => {
-        console.log("Estamos tocando al modelo");
+      // onClick={() => {
+      //   console.log("Estamos tocando al modelo");
+      // }}
+      // onPointerOver={() => setHover(true)}
+      // onPointerOut={() => setHover(false)}
+      onTouchStart={() => {
+        console.log("estamos dando toques al modelos 3d");
       }}
-      onPointerOver={() => setHover(true)}
-      onPointerOut={() => setHover(false)}
     />
   );
 };

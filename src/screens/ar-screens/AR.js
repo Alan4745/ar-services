@@ -32,15 +32,29 @@ function AR() {
 
   useEffect(() => {
     return () => {
-      console.log("estamos");
       if (camera.current) {
         camera.current.stop();
       }
     };
   }, []);
 
+  function NoZoom() {
+    useEffect(() => {
+      const meta = document.createElement("meta");
+      meta.setAttribute("name", "viewport");
+      meta.setAttribute(
+        "content",
+        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      );
+      document.head.appendChild(meta);
+    }, []);
+
+    return null;
+  }
+
   return (
     <div style={{ backgroundColor: "#000", height: "100vh", width: "100%" }}>
+      <NoZoom />
       <BrowserCompatibility />
       <ZapparCanvas>
         <ambientLight intensity={1} />
@@ -62,7 +76,7 @@ function AR() {
             ) : null}
           </InstantTracker>
         </Suspense>
-        <Loader />
+        {/* <Loader /> */}
       </ZapparCanvas>
       <div
         id="zappar-placement-ui"
@@ -74,6 +88,20 @@ function AR() {
         Tap here to
         {placementMode ? " place " : " pick up "}
         the object
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          bottom: "100px",
+          left: "calc(50% - 100px)",
+          backgroundColor: "#000",
+          color: "#fff",
+        }}
+        onTouchStart={() => {
+          console.log("estamso dando toques");
+        }}
+      >
+        <span>Estamos probando</span>
       </div>
     </div>
   );
