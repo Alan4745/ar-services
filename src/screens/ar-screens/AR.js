@@ -53,7 +53,14 @@ function AR() {
   }
 
   return (
-    <div style={{ backgroundColor: "#000", height: "100vh", width: "100%" }}>
+    <div
+      style={{
+        backgroundColor: "#000",
+        height: "100vh",
+        width: "100%",
+        overflow: "hidden",
+      }}
+    >
       <NoZoom />
       <BrowserCompatibility />
       <ZapparCanvas>

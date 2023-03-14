@@ -2,8 +2,9 @@ import React, { useEffect, useState, memo, useRef } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
-import { createUseGesture } from "@use-gesture/react";
-import { pinchAction } from "@use-gesture/react/dist/declarations/src";
+import { useGesture } from "@use-gesture/react";
+import { useSpring, animated } from "@react-spring/three";
+import { Html } from "@react-three/drei";
 
 function Model3d(props) {
   const gltf = useLoader(GLTFLoader, props.model);
@@ -22,6 +23,7 @@ function Model3d(props) {
     sizeY: size1.y,
     sizeZ: size1.z,
   });
+  const [data, setdata] = useState(1);
 
   useEffect(() => {
     setSizeCordenadas({
@@ -43,15 +45,28 @@ function Model3d(props) {
 
   console.log(scaleModel, "scaleModel");
 
-  const useGesture = createUseGesture([pinchAction]);
+  // const [{ scale }, set] = useSpring(() => ({ scale: 1 }));
+
+  const bind = useGesture({
+    onPinch: ({ delta }) => {
+      console.log("estamos en onPinch");
+      // set({ scale: Math.max(scale.get() + delta[0] * 0.01, 0.2) });
+      setdata(delta[0] * 0.01);
+    },
+  });
 
   return (
     <group>
-      <primitive
-        object={gltf.scene}
-        scale={props.scale1}
-        rotation={[0, (180 * Math.PI) / 180, 0]}
-      />
+      <animated.group {...bind()}>
+        <primitive
+          object={gltf.scene}
+          scale={props.scale1}
+          rotation={[0, (180 * Math.PI) / 180, 0]}
+        />
+        <Html>
+          <h1>{data}</h1>
+        </Html>
+      </animated.group>
     </group>
   );
 }
