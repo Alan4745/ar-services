@@ -10,6 +10,9 @@ import {
 } from "@zappar/zappar-react-three-fiber";
 import Model3d from "./Model3d";
 import { useRef } from "react";
+import { useGesture, usePinch } from "@use-gesture/react";
+import { useSpring, animated } from "@react-spring/three";
+
 function AR() {
   let { id } = useParams();
   const [configAr, setConfigAr] = useState({});
@@ -28,9 +31,10 @@ function AR() {
   const [placementMode, setPlacementMode] = useState(true);
 
   const camera = useRef();
-  console.log(camera);
 
   useEffect(() => {
+    // setZoom());
+    console.log(configAr.scaleModel);
     return () => {
       if (camera.current) {
         camera.current.stop();
@@ -52,6 +56,27 @@ function AR() {
     return null;
   }
 
+  const [zoom, setZoom] = useState(null);
+
+  useEffect(() => {
+    setZoom(parseFloat(configAr.scaleModel));
+  }, [configAr]);
+
+  // const bind = usePinch(({ offset: [d], last }) => {
+  //   console.log("estamos usando pinch");
+  //   if (last) {
+  //     setZoom((prev) => prev + d / 100);
+  //   }
+  // });
+
+  const bind = useGesture({
+    onPinch: ({ delta }) => {
+      console.log("estamos en onPinch");
+      // set({ scale: Math.max(scale.get() + delta[0] * 0.01, 0.2) });
+      setZoom((prev) => prev + delta[0] / 100);
+    },
+  });
+
   return (
     <div
       style={{
@@ -63,7 +88,7 @@ function AR() {
     >
       <NoZoom />
       <BrowserCompatibility />
-      <ZapparCanvas>
+      <ZapparCanvas {...bind()}>
         <ambientLight intensity={1} />
         <directionalLight position={[0, 2, 2]} />
         <directionalLight position={[0, 2, -2]} />
@@ -78,7 +103,7 @@ function AR() {
               <Model3d
                 model={configAr.urlModel}
                 size={configAr.sizeModel}
-                scale1={configAr.scaleModel}
+                scale1={zoom}
               />
             ) : null}
           </InstantTracker>
@@ -108,7 +133,7 @@ function AR() {
           console.log("estamso dando toques");
         }}
       >
-        <span>Estamos probando</span>
+        <span>{zoom}</span>
       </div>
     </div>
   );

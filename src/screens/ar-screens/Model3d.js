@@ -47,27 +47,12 @@ function Model3d(props) {
 
   // const [{ scale }, set] = useSpring(() => ({ scale: 1 }));
 
-  const bind = useGesture({
-    onPinch: ({ delta }) => {
-      console.log("estamos en onPinch");
-      // set({ scale: Math.max(scale.get() + delta[0] * 0.01, 0.2) });
-      setdata(delta[0] * 0.01);
-    },
-  });
-
   return (
-    <group>
-      <animated.group {...bind()}>
-        <primitive
-          object={gltf.scene}
-          scale={props.scale1}
-          rotation={[0, (180 * Math.PI) / 180, 0]}
-        />
-        <Html>
-          <h1>{data}</h1>
-        </Html>
-      </animated.group>
-    </group>
+    <primitive
+      object={gltf.scene}
+      scale={props.scale1}
+      rotation={[0, (180 * Math.PI) / 180, 0]}
+    />
   );
 }
 
