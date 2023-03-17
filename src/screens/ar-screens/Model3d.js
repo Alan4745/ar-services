@@ -8,7 +8,8 @@ import { Html } from "@react-three/drei";
 
 function Model3d(props) {
   const gltf = useLoader(GLTFLoader, props.model);
-
+  const clock = new THREE.Clock()
+  const mixer = new THREE.AnimationMixer(gltf.scene)
   const boxRef = useRef(new THREE.Box3().setFromObject(gltf.scene));
   const size1 = new THREE.Vector3();
 
@@ -44,6 +45,26 @@ function Model3d(props) {
   console.log(SizeModel, "SizeModel");
 
   console.log(scaleModel, "scaleModel");
+
+  const animate = () => {
+    mixer.update(clock.getDelta());
+    requestAnimationFrame(animate);
+  };
+
+
+  console.log('la experiencia no se está subiendo');
+  if (gltf.animations.length > 0) {
+    console.log('estamos entrando en el if')
+
+    const action = mixer.clipAction(gltf.animations[0])
+    action.play()
+
+    // start the animation loop
+    animate();
+
+    console.log('se está animando');
+  }
+
 
   // const [{ scale }, set] = useSpring(() => ({ scale: 1 }));
 

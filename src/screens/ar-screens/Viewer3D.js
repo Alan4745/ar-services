@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
+
 import {
   Circle,
   Html,
@@ -23,6 +23,8 @@ import { useNavigate } from "react-router-dom";
 
 const Model3D = (props) => {
   const gltf = useLoader(GLTFLoader, props.model);
+  const clock = new THREE.Clock()
+  const mixer = new THREE.AnimationMixer(gltf.scene)
   const navigate = useNavigate();
   let box = new THREE.Box3().setFromObject(gltf.scene);
   let size = new THREE.Vector3();
@@ -79,15 +81,45 @@ const Model3D = (props) => {
   const sizeModel1 =
     scaleModel1 * Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
 
+  // if (gltf.animations.length > 0) {
+  //   console.log('estamos entrado en el if');
+  // }
+
+  // if (gltf.animations && gltf.animations.length > 0) {
+  //   console.log('El modelo tiene animaciones');
+  // } else {
+  //   console.log('El modelo no tiene animaciones');
+  // }
+
+
+  const animate = () => {
+    mixer.update(clock.getDelta());
+    requestAnimationFrame(animate);
+  };
+
+  if (props.imgUp) {
+    console.log('subiendo la experiencia')
+  } else {
+    console.log('la experiencia no se está subiendo');
+    if (gltf.animations.length > 0) {
+      console.log('estamos entrando en el if')
+
+      const action = mixer.clipAction(gltf.animations[0])
+      action.play()
+
+      // start the animation loop
+      animate();
+
+      console.log('se está animando');
+    }
+  }
+
+
+
   return (
     <primitive
       scale={scaleModel1}
       object={gltf.scene}
-      // onClick={() => {
-      //   console.log("Estamos tocando al modelo");
-      // }}
-      // onPointerOver={() => setHover(true)}
-      // onPointerOut={() => setHover(false)}
       onTouchStart={() => {
         console.log("estamos dando toques al modelos 3d");
       }}
@@ -121,10 +153,12 @@ const Viewer3D = () => {
   const controlsRef = useRef();
   const [initialPosition, setInitialPosition] = useState([1, 1.5, 1]);
   const [upLoadExp, setupLoadExp] = useState(false);
+  const [imageUp, setImageUp] = useState(false);
 
   const handleSumit = async (e) => {
     setDisable(true);
     setShowPorcet(true);
+    setImageUp(true)
     e.preventDefault();
     console.log("subiendo archivo");
 
@@ -136,6 +170,7 @@ const Viewer3D = () => {
       setReplay(false);
       setSave(false);
       setShowPorcet(false);
+      setImageUp(false)
       setProgress(0);
       handleReset();
     } catch (error) {
@@ -173,6 +208,8 @@ const Viewer3D = () => {
     controls.update();
   };
 
+
+
   return (
     <>
       <div style={style.container}>
@@ -196,8 +233,8 @@ const Viewer3D = () => {
               path={path}
               size={size1}
               upExp={upLoadExp}
+              imgUp={imageUp}
             />
-
             <OrbitControls ref={controlsRef} />
           </Suspense>
         </Canvas>
