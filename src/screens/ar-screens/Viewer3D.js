@@ -211,6 +211,29 @@ const Viewer3D = () => {
   };
 
 
+  const CLIENT_ID = 'vagG6eINsnorKHmdlGd4iUbs2kiGvlULCKsclozk';
+  const AUTHENTICATION_URL = `https://sketchfab.com/oauth2/authorize/?state=123456789&response_type=token&client_id=${CLIENT_ID}`;
+
+  function authenticate() {
+    window.open(AUTHENTICATION_URL, '_blank');
+  }
+
+  function checkToken() {
+    // Check if there's a new token from the URL
+    const url = new URL(window.location)
+    // Extract the token and save it
+    const hashParams = url.hash.split('&');
+    for (let param of hashParams) {
+      if (param.indexOf("access_token") !== -1) {
+        const token = param.replace('#access_token=', '');
+        console.log("Detected Sketchfab token: ", token);
+        localStorage.setItem("sb_token", token);
+      }
+    }
+
+    // Load token from local storage
+    this.token = localStorage.getItem("sb_token");
+  }
 
   return (
     <>
@@ -297,6 +320,9 @@ const Viewer3D = () => {
             </Button>
           </div>
         </form>
+        <Button onClick={() => { authenticate() }}>
+          login sketchfab
+        </Button>
       </div>
     </>
   );
