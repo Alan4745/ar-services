@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState, useRef, useMemo } from "react";
 import { Navigate, unstable_HistoryRouter, useParams } from "react-router-dom";
 import { getIdModelConfig } from "../../API/ArServiceApis";
 import {
@@ -9,18 +9,34 @@ import {
   ZapparCanvas,
 } from "@zappar/zappar-react-three-fiber";
 import Model3d from "./Model3d";
-import { useRef } from "react";
 import { useGesture, usePinch } from "@use-gesture/react";
 import { useSpring, animated } from "@react-spring/three";
-import { useLoader } from "@react-three/fiber";
-import { TextureLoader } from "three";
+import { useFrame, useLoader } from "@react-three/fiber";
+import * as THREE from 'three';
 import imgHost from '../../assets/hotspot.png'
+
+const Floor = () => {
+  const floorRef = useRef();
+
+  useFrame(() => {
+    floorRef.current.position.y = 0
+  })
+
+  const texture = useMemo(() => new THREE.TextureLoader().load(imgHost), [imgHost]);
+
+  return (
+    <mesh ref={floorRef} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeBufferGeometry attach="geometry" args={[3, 3]} />
+      <meshStandardMaterial attach="material" map={texture} transparent={true} />
+    </mesh>
+  )
+}
 
 function AR() {
   let { id } = useParams();
   const [configAr, setConfigAr] = useState({});
   const [out, setOut] = useState(false);
-  const colorMap = useLoader(TextureLoader, imgHost)
+  // const colorMap = useLoader(TextureLoader, imgHost)
 
   useEffect(() => {
     const loadConfigAr = async () => {
@@ -86,27 +102,19 @@ function AR() {
       <ZapparCanvas>
         <ZapparCamera ref={camera} />
         <InstantTracker placementMode={placementMode} placementCameraOffset={[0, 0, -5]}>
-          {configAr.urlModel !== undefined ? (
-            <Model3d
-              model={configAr.urlModel}
-              size={configAr.sizeModel}
-              scale1={zoom}
-            />
-          ) : null}
+          <Suspense fallback={null}>
+            {configAr.urlModel !== undefined ? (
+              <Model3d
+                model={configAr.urlModel}
+                size={configAr.sizeModel}
+                scale1={zoom} />
 
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-            <boxBufferGeometry args={[3, 3, 0]} />
-            <meshBasicMaterial map={colorMap} transparent={true} />
-          </mesh>
+            ) : null}
+            <Floor />
+          </Suspense>
+
+
         </InstantTracker>
-        {/* <directionalLight position={[2.5, 8, 5]} intensity={1.5} /> */}
-        {/* <directionalLight intensity={0.5} position={[0, 0.5, 2]} />
-        <directionalLight intensity={0.5} position={[-1, 0.5, 1]} />
-        <directionalLight intensity={0.5} position={[1, 0.5, 1]} />
-        <directionalLight intensity={0.5} position={[2, 0.5, 0]} />
-        <directionalLight intensity={0.5} position={[-2, 0.5, 0]} />
-        <directionalLight intensity={0.5} position={[0, 0.5, -2]} />
-        <directionalLight intensity={0.5} position={[1, 0.5, 1]} /> */}
         <directionalLight intensity={1.5} position={[-1, 0.5, -1]} />
         <ambientLight intensity={1.5} />
       </ZapparCanvas>

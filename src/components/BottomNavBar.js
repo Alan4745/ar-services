@@ -90,6 +90,23 @@ const BottomNavBar = ({ setIsLoggedIn }) => {
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
+
+  console.log('estamos dentro de welcome');
+
+  const urlParams = new URLSearchParams(window.location.hash.substr(1));
+  const token = urlParams.get('access_token');
+
+  if (token) {
+    // El token se ha extraído correctamente
+    // Almacena el token en una cookie o en el almacenamiento local del navegador
+    localStorage.setItem('sketchfab_token', token);
+    console.log(token, 'token');
+    // Redirige al usuario a la página principal de tu sitio web
+  } else {
+    // No se pudo extraer el token
+    console.error('No se pudo extraer el token');
+  }
+
   return (
     <>
       <Modal

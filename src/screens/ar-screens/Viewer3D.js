@@ -9,7 +9,7 @@ import {
   useProgress,
 } from "@react-three/drei";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import React, { createRef, Suspense, useEffect, useRef, useState } from "react";
+import React, { createRef, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import modelDefault from "../../assets/test.glb";
 import * as THREE from "three";
@@ -20,8 +20,9 @@ import Button from "@mui/material/Button";
 import { uploadFile, deleteFile } from "../../API/firebase/config";
 import { SaveModel3D } from "../../API/ArServiceApis";
 import { useNavigate } from "react-router-dom";
-import { TextureLoader } from "three";
+
 import imgHost from '../../assets/hotspot.png'
+
 const Model3D = (props) => {
   const gltf = useLoader(GLTFLoader, props.model);
   const clock = new THREE.Clock()
@@ -137,6 +138,24 @@ const Loader = () => {
   );
 };
 
+const Floor = () => {
+  const floorRef = useRef();
+
+  useFrame(() => {
+    floorRef.current.position.y = 0
+  })
+
+  const texture = useMemo(() => new THREE.TextureLoader().load(imgHost), [imgHost]);
+
+  return (
+    <mesh ref={floorRef} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeBufferGeometry attach="geometry" args={[3, 3]} />
+      <meshStandardMaterial attach="material" map={texture} transparent={true} />
+    </mesh>
+  )
+}
+
+
 const Viewer3D = () => {
   const [file, setFile] = useState(null);
   const inputRef = createRef();
@@ -155,7 +174,6 @@ const Viewer3D = () => {
   const [initialPosition, setInitialPosition] = useState([1, 1.5, 1]);
   const [upLoadExp, setupLoadExp] = useState(false);
   const [imageUp, setImageUp] = useState(false);
-  const colorMap = useLoader(TextureLoader, imgHost)
 
   const handleSumit = async (e) => {
     setDisable(true);
@@ -218,36 +236,67 @@ const Viewer3D = () => {
     window.open(AUTHENTICATION_URL, '_blank');
   }
 
-  const urlParams = new URLSearchParams(window.location.hash.substr(1));
-  const token = urlParams.get('access_token');
+  async function getModelDownloadUrl(inputUrl) {
+    // Extract the model ID from the URL
+    const input = new URL(inputUrl);
+    // The ID is always the last string when seperating by '-'
+    const pieces = input.pathname.split('-');
+    const modelID = pieces[pieces.length - 1];
+    const token = localStorage.getItem('sketchfab_token');
 
-  if (token) {
-    // El token se ha extraído correctamente
-    // Ahora puedes usar el token para acceder a la API de Sketchfab
-    console.log('Token:', token);
-  } else {
-    // No se pudo extraer el token
-    console.log('No se pudo extraer el token');
+    const metadataUrl = `https://api.sketchfab.com/v3/models/${modelID}/download`;
+    const options = {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      mode: 'cors'
+    };
+
+    // This call will fail if model can't be downloaded
+    const response = await fetch(metadataUrl, options);
+    const metadata = await response.json();
+    console.log(response)
+    console.log(metadata.gltf.url)
+    return metadata.gltf.url;
   }
 
-  function checkToken() {
-    // Check if there's a new token from the URL
-    const url = new URL(window.location)
-    // Extract the token and save it
-    const hashParams = url.hash.split('&');
-    for (let param of hashParams) {
-      if (param.indexOf("access_token") !== -1) {
-        const token = param.replace('#access_token=', '');
-        console.log("Detected Sketchfab token: ", token);
-        localStorage.setItem("sb_token", token);
-      }
-    }
+
+  const test = getModelDownloadUrl('https://sketchfab.com/3d-models/scifi-girl-v01-96340701c2ed4d37851c7d9109eee9c0')
+  console.log(test)
+  // getModelDownloadUrl('https://sketchfab.com/3d-models/skull-downloadable-1a9db900738d44298b0bc59f68123393')
+
+
+  // const urlParams = new URLSearchParams(window.location.hash.substr(1));
+  // const token = urlParams.get('access_token');
+
+  // if (token) {
+  //   // El token se ha extraído correctamente
+  //   // Ahora puedes usar el token para acceder a la API de Sketchfab
+  //   console.log('Token:', token);
+  // } else {
+  //   // No se pudo extraer el token
+  //   console.log('No se pudo extraer el token');
+  // }
+
+  // function checkToken() {
+  //   // Check if there's a new token from the URL
+  //   const url = new URL(window.location)
+  //   // Extract the token and save it
+  //   const hashParams = url.hash.split('&');
+  //   for (let param of hashParams) {
+  //     if (param.indexOf("access_token") !== -1) {
+  //       const token = param.replace('#access_token=', '');
+  //       console.log("Detected Sketchfab token: ", token);
+  //       localStorage.setItem("sb_token", token);
+  //     }
+  //   }
 
 
 
-    // Load token from local storage
-    this.token = localStorage.getItem("sb_token");
-  }
+  //   // Load token from local storage
+  //   this.token = localStorage.getItem("sb_token");
+  // }
 
 
   return (
@@ -275,10 +324,7 @@ const Viewer3D = () => {
               upExp={upLoadExp}
               imgUp={imageUp}
             />
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-              <boxBufferGeometry args={[3, 3, 0]} />
-              <meshBasicMaterial map={colorMap} transparent={true} />
-            </mesh>
+            <Floor />
             <OrbitControls ref={controlsRef} />
           </Suspense>
         </Canvas>
@@ -338,9 +384,7 @@ const Viewer3D = () => {
         <Button onClick={() => { authenticate() }}>
           login sketchfab
         </Button>
-        <Button onClick={() => { checkToken() }}>
-          test sketchfab
-        </Button>
+
       </div>
     </>
   );
