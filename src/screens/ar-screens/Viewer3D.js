@@ -20,9 +20,8 @@ import Button from "@mui/material/Button";
 import { uploadFile, deleteFile } from "../../API/firebase/config";
 import { SaveModel3D } from "../../API/ArServiceApis";
 import { useNavigate } from "react-router-dom";
-import imgHost from '../../assets/hotspot.png'
 import { TextureLoader } from "three";
-
+import imgHost from '../../assets/hotspot.png'
 const Model3D = (props) => {
   const gltf = useLoader(GLTFLoader, props.model);
   const clock = new THREE.Clock()
@@ -31,8 +30,6 @@ const Model3D = (props) => {
   let box = new THREE.Box3().setFromObject(gltf.scene);
   let size = new THREE.Vector3();
   box.getSize(size);
-
-
 
   const [sizeXYZ, setSizeXYZ] = useState({
     sizeX: size.x,
@@ -158,7 +155,6 @@ const Viewer3D = () => {
   const [initialPosition, setInitialPosition] = useState([1, 1.5, 1]);
   const [upLoadExp, setupLoadExp] = useState(false);
   const [imageUp, setImageUp] = useState(false);
-
   const colorMap = useLoader(TextureLoader, imgHost)
 
   const handleSumit = async (e) => {
@@ -214,7 +210,7 @@ const Viewer3D = () => {
     controls.update();
   };
 
-  console.log(colorMap);
+
 
   return (
     <>
