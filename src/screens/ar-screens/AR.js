@@ -91,15 +91,8 @@ function AR() {
           ) : null}
         </InstantTracker>
         {/* <directionalLight position={[2.5, 8, 5]} intensity={1.5} /> */}
-        <directionalLight intensity={0.5} position={[0, 0.5, 2]} />
-        <directionalLight intensity={0.5} position={[-1, 0.5, 1]} />
-        <directionalLight intensity={0.5} position={[1, 0.5, 1]} />
-        <directionalLight intensity={0.5} position={[2, 0.5, 0]} />
-        <directionalLight intensity={0.5} position={[-2, 0.5, 0]} />
-        <directionalLight intensity={0.5} position={[0, 0.5, -2]} />
-        <directionalLight intensity={0.5} position={[1, 0.5, 1]} />
+
         <directionalLight intensity={0.5} position={[-1, 0.5, -1]} />
-        <ambientLight intensity={0.1} />
       </ZapparCanvas>
       <div
         id="zappar-placement-ui"
