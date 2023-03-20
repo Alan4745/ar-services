@@ -12,11 +12,15 @@ import Model3d from "./Model3d";
 import { useRef } from "react";
 import { useGesture, usePinch } from "@use-gesture/react";
 import { useSpring, animated } from "@react-spring/three";
+import { useLoader } from "@react-three/fiber";
+import { TextureLoader } from "three";
+import imgHost from '../../assets/hotspot.png'
 
 function AR() {
   let { id } = useParams();
   const [configAr, setConfigAr] = useState({});
   const [out, setOut] = useState(false);
+  const colorMap = useLoader(TextureLoader, imgHost)
 
   useEffect(() => {
     const loadConfigAr = async () => {
@@ -89,6 +93,11 @@ function AR() {
               scale1={zoom}
             />
           ) : null}
+
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+            <boxBufferGeometry args={[3, 3, 0]} />
+            <meshBasicMaterial map={colorMap} transparent={true} />
+          </mesh>
         </InstantTracker>
         {/* <directionalLight position={[2.5, 8, 5]} intensity={1.5} /> */}
         {/* <directionalLight intensity={0.5} position={[0, 0.5, 2]} />
