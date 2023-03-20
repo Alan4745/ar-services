@@ -218,6 +218,18 @@ const Viewer3D = () => {
     window.open(AUTHENTICATION_URL, '_blank');
   }
 
+  const urlParams = new URLSearchParams(window.location.hash.substr(1));
+  const token = urlParams.get('access_token');
+
+  if (token) {
+    // El token se ha extraído correctamente
+    // Ahora puedes usar el token para acceder a la API de Sketchfab
+    console.log('Token:', token);
+  } else {
+    // No se pudo extraer el token
+    console.log('No se pudo extraer el token');
+  }
+
   function checkToken() {
     // Check if there's a new token from the URL
     const url = new URL(window.location)
@@ -231,9 +243,12 @@ const Viewer3D = () => {
       }
     }
 
+
+
     // Load token from local storage
     this.token = localStorage.getItem("sb_token");
   }
+
 
   return (
     <>
@@ -270,7 +285,7 @@ const Viewer3D = () => {
       </div>
       <div style={style.modalFloat}>
         <p style={style.info}>currently only supports .glb files</p>
-        <form style={style.formStyle} onSubmit={handleSumit}>
+        {/* <form style={style.formStyle} onSubmit={handleSumit}>
           <input
             type="file"
             style={style.inputFile}
@@ -319,9 +334,12 @@ const Viewer3D = () => {
               Save
             </Button>
           </div>
-        </form>
+        </form> */}
         <Button onClick={() => { authenticate() }}>
           login sketchfab
+        </Button>
+        <Button onClick={() => { checkToken() }}>
+          test sketchfab
         </Button>
       </div>
     </>
