@@ -102,17 +102,13 @@ const Model3D = (props) => {
   if (props.imgUp) {
     console.log('subiendo la experiencia')
   } else {
-    console.log('la experiencia no se está subiendo');
     if (gltf.animations.length > 0) {
-      console.log('estamos entrando en el if')
-
       const action = mixer.clipAction(gltf.animations[0])
       action.play()
 
       // start the animation loop
       animate();
 
-      console.log('se está animando');
     }
   }
 
@@ -244,6 +240,8 @@ const Viewer3D = () => {
     const modelID = pieces[pieces.length - 1];
     const token = localStorage.getItem('sketchfab_token');
 
+    console.log(modelID, 'modelID')
+
     const metadataUrl = `https://api.sketchfab.com/v3/models/${modelID}/download`;
     const options = {
       method: 'GET',
@@ -256,8 +254,7 @@ const Viewer3D = () => {
     // This call will fail if model can't be downloaded
     const response = await fetch(metadataUrl, options);
     const metadata = await response.json();
-    console.log(response)
-    console.log(metadata.gltf.url)
+
     return metadata.gltf.url;
   }
 
@@ -315,7 +312,7 @@ const Viewer3D = () => {
           <directionalLight intensity={0.5} position={[1, 0.5, 1]} />
           <directionalLight intensity={0.5} position={[-1, 0.5, -1]} />
 
-          <Suspense fallback={<Loader />}>
+          <Suspense fallback={null}>
             {/* <Model3d model={urlfile} size={size1} /> */}
             <Model3D
               model={urlfile}
@@ -330,8 +327,8 @@ const Viewer3D = () => {
         </Canvas>
       </div>
       <div style={style.modalFloat}>
-        <p style={style.info}>currently only supports .glb files</p>
-        {/* <form style={style.formStyle} onSubmit={handleSumit}>
+        {/* <p style={style.info}>currently only supports .glb files</p> */}
+        <form style={style.formStyle} onSubmit={handleSumit}>
           <input
             type="file"
             style={style.inputFile}
@@ -380,10 +377,11 @@ const Viewer3D = () => {
               Save
             </Button>
           </div>
-        </form> */}
+        </form>
         <Button onClick={() => { authenticate() }}>
           login sketchfab
         </Button>
+        <input type='text' placeholder="ingresa el link" />
 
       </div>
     </>
