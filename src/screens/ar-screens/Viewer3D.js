@@ -121,7 +121,7 @@ const Floor = () => {
   const floorRef = useRef();
 
   useFrame(() => {
-    floorRef.current.position.y = -0.1
+    floorRef.current.position.y = 0
   })
 
   const texture = useMemo(() => new THREE.TextureLoader().load(imgHost), [imgHost]);
@@ -204,11 +204,6 @@ const Viewer3D = () => {
     controls.update();
   };
 
-  useEffect(() => {
-    test(urlSketchab)
-
-  }, [urlSketchab]);
-
 
   const CLIENT_ID = 'vagG6eINsnorKHmdlGd4iUbs2kiGvlULCKsclozk';
   const AUTHENTICATION_URL = `https://sketchfab.com/oauth2/authorize/?state=123456789&response_type=token&client_id=${CLIENT_ID}`;
@@ -251,43 +246,35 @@ const Viewer3D = () => {
   }
 
 
-  async function test(url) {
-    console.log(url);
-    if (url) {
-      console.log('estamos dentro del if')
+  async function test(url1) {
+    const result = await getModelDownloadUrl(url1)
+    const response = await fetch(result)
 
-      const result = await getModelDownloadUrl(url)
-      const response = await fetch(result)
+    const fileblob = await response.blob()
 
-      const fileblob = await response.blob()
+    console.log(fileblob)
 
-      console.log(fileblob)
+    try {
+      const result = await uploadFile(fileblob, setProgress);
 
-      try {
-        const result = await uploadFile(fileblob, setProgress);
-
-        setUrlFile(result.url);
-        setPath(result.metaData.fullPath);
-        setReplay(false);
-        setSave(false);
-        setShowPorcet(false);
-        setImageUp(false)
-        setProgress(0);
-        handleReset();
-      } catch (error) {
-        console.log(error);
-      }
-
-    } else {
-      console.log('estamos dentro del else');
+      setUrlFile(result.url);
+      setPath(result.metaData.fullPath);
+      setReplay(false);
+      setSave(false);
+      setShowPorcet(false);
+      setImageUp(false)
+      setProgress(0);
+      handleReset();
+    } catch (error) {
+      console.log(error);
     }
-
 
   }
 
   useEffect(() => {
+    test(urlSketchab)
 
-  }, []);
+  }, [urlSketchab]);
 
   function getExtension(filename) {
     return filename.toLowerCase().split('.').pop();
