@@ -1,13 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import {
-  Circle,
-  Html,
-  OrbitControls,
-  Sky,
-  useCursor,
-  useProgress,
-} from "@react-three/drei";
+import { Html, OrbitControls, useCursor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import React, { createRef, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -22,6 +15,10 @@ import { SaveModel3D } from "../../API/ArServiceApis";
 import { useNavigate } from "react-router-dom";
 
 import imgHost from '../../assets/hotspot.png'
+import JSZip from "jszip";
+import { Input } from "semantic-ui-react";
+import { InputBase } from "@mui/material";
+import { borderRadius } from "@mui/system";
 
 const Model3D = (props) => {
   const gltf = useLoader(GLTFLoader, props.model);
@@ -83,17 +80,6 @@ const Model3D = (props) => {
   const sizeModel1 =
     scaleModel1 * Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
 
-  // if (gltf.animations.length > 0) {
-  //   console.log('estamos entrado en el if');
-  // }
-
-  // if (gltf.animations && gltf.animations.length > 0) {
-  //   console.log('El modelo tiene animaciones');
-  // } else {
-  //   console.log('El modelo no tiene animaciones');
-  // }
-
-
   const animate = () => {
     mixer.update(clock.getDelta());
     requestAnimationFrame(animate);
@@ -111,9 +97,6 @@ const Model3D = (props) => {
 
     }
   }
-
-
-
   return (
     <primitive
       scale={scaleModel1}
@@ -138,7 +121,7 @@ const Floor = () => {
   const floorRef = useRef();
 
   useFrame(() => {
-    floorRef.current.position.y = 0
+    floorRef.current.position.y = -0.1
   })
 
   const texture = useMemo(() => new THREE.TextureLoader().load(imgHost), [imgHost]);
@@ -170,6 +153,7 @@ const Viewer3D = () => {
   const [initialPosition, setInitialPosition] = useState([1, 1.5, 1]);
   const [upLoadExp, setupLoadExp] = useState(false);
   const [imageUp, setImageUp] = useState(false);
+  const [urlSketchab, setUrlSketchab] = useState(null);
 
   const handleSumit = async (e) => {
     setDisable(true);
@@ -192,10 +176,6 @@ const Viewer3D = () => {
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const handleChange3 = (event) => {
-    setSize1(event.target.value); // Actualizar el valor del slider
   };
 
   const rebootSetting = async () => {
@@ -224,6 +204,11 @@ const Viewer3D = () => {
     controls.update();
   };
 
+  useEffect(() => {
+    test(urlSketchab)
+
+  }, [urlSketchab]);
+
 
   const CLIENT_ID = 'vagG6eINsnorKHmdlGd4iUbs2kiGvlULCKsclozk';
   const AUTHENTICATION_URL = `https://sketchfab.com/oauth2/authorize/?state=123456789&response_type=token&client_id=${CLIENT_ID}`;
@@ -240,7 +225,7 @@ const Viewer3D = () => {
     const modelID = pieces[pieces.length - 1];
     const token = localStorage.getItem('sketchfab_token');
 
-    console.log(modelID, 'modelID')
+    // console.log(modelID, 'modelID')
 
     const metadataUrl = `https://api.sketchfab.com/v3/models/${modelID}/download`;
     const options = {
@@ -253,47 +238,109 @@ const Viewer3D = () => {
 
     // This call will fail if model can't be downloaded
     const response = await fetch(metadataUrl, options);
+    // console.log(response);
     const metadata = await response.json();
+    console.log(metadata.glb.url)
+    return metadata.glb.url;
+  }
 
-    return metadata.gltf.url;
+  async function getFileUrl(file) {
+    const blob = await file.async('blob');
+    const url = URL.createObjectURL(blob);
+    return url;
   }
 
 
-  const test = getModelDownloadUrl('https://sketchfab.com/3d-models/scifi-girl-v01-96340701c2ed4d37851c7d9109eee9c0')
-  console.log(test)
-  // getModelDownloadUrl('https://sketchfab.com/3d-models/skull-downloadable-1a9db900738d44298b0bc59f68123393')
+  async function test(url) {
+    console.log(url);
+    if (url) {
+      console.log('estamos dentro del if')
+
+      const result = await getModelDownloadUrl(url)
+      const response = await fetch(result)
+
+      const fileblob = await response.blob()
+
+      console.log(fileblob)
+
+      try {
+        const result = await uploadFile(fileblob, setProgress);
+
+        setUrlFile(result.url);
+        setPath(result.metaData.fullPath);
+        setReplay(false);
+        setSave(false);
+        setShowPorcet(false);
+        setImageUp(false)
+        setProgress(0);
+        handleReset();
+      } catch (error) {
+        console.log(error);
+      }
+
+    } else {
+      console.log('estamos dentro del else');
+    }
 
 
-  // const urlParams = new URLSearchParams(window.location.hash.substr(1));
-  // const token = urlParams.get('access_token');
+  }
 
-  // if (token) {
-  //   // El token se ha extraído correctamente
-  //   // Ahora puedes usar el token para acceder a la API de Sketchfab
-  //   console.log('Token:', token);
-  // } else {
-  //   // No se pudo extraer el token
-  //   console.log('No se pudo extraer el token');
-  // }
+  useEffect(() => {
 
-  // function checkToken() {
-  //   // Check if there's a new token from the URL
-  //   const url = new URL(window.location)
-  //   // Extract the token and save it
-  //   const hashParams = url.hash.split('&');
-  //   for (let param of hashParams) {
-  //     if (param.indexOf("access_token") !== -1) {
-  //       const token = param.replace('#access_token=', '');
-  //       console.log("Detected Sketchfab token: ", token);
-  //       localStorage.setItem("sb_token", token);
-  //     }
-  //   }
+  }, []);
+
+  function getExtension(filename) {
+    return filename.toLowerCase().split('.').pop();
+  }
+
+  async function readZip(zipUrl) {
+    const response = await fetch(zipUrl)
+    console.log(response)
+
+    const arrayBuffer = await response.arrayBuffer();
+
+    console.log(arrayBuffer)
 
 
 
-  //   // Load token from local storage
-  //   this.token = localStorage.getItem("sb_token");
-  // }
+    const result = await JSZip.loadAsync(arrayBuffer);
+    console.log(result)
+
+    const files = Object.values(result.files).filter(item => !item.dir);
+    console.log(files)
+
+    const entryFile = files.find(f => getExtension(f.name) === 'gltf')
+    console.log(entryFile)
+
+    const blobUrls = {};
+    console.log(blobUrls)
+
+    for (const file of files) {
+      console.log(`Loading ${file.name}...`);
+      blobUrls[file.name] = await getFileUrl(file)
+    }
+    const fileUrl = blobUrls[entryFile.name];
+
+    console.log(fileUrl)
+
+
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.setURLModifier((url) => {
+      const parsedUrl = new URL(url);
+      const origin = parsedUrl.origin;
+      const path = parsedUrl.pathname;
+      const relativeUrl = path.replace(origin + '/', "");
+
+      if (blobUrls[relativeUrl] != undefined) {
+        return blobUrls[relativeUrl];
+      }
+
+      return url
+    });
+
+    console.log(loadingManager)
+
+  }
 
 
   return (
@@ -376,12 +423,29 @@ const Viewer3D = () => {
             >
               Save
             </Button>
+
+
           </div>
         </form>
-        <Button onClick={() => { authenticate() }}>
+        <InputBase style={style.inputBase} size='medium' type='text' placeholder="ingresa al link" fullWidth={true}
+          onChange={(e) => { setUrlSketchab(e.target.value) }} />
+
+        {/* <Button onClick={() => { authenticate() }}>
+          login sketchfab
+        </Button> */}
+        {/* <input type='text' placeholder="model link" /> */}
+
+      </div>
+      <div style={style.modalLoginSke}>
+        <Button
+          variant="contained"
+          type="submit"
+          size="small"
+          onClick={() => { authenticate() }}>
           login sketchfab
         </Button>
-        <input type='text' placeholder="ingresa el link" />
+        {/* <input type='text' placeholder="model link" /> */}
+        {/* <InputBase style={style.inputBase} size='small' type='text' placeholder="ingresa al link" /> */}
 
       </div>
     </>
@@ -410,6 +474,20 @@ const style = {
     left: "50%",
     transform: "translate(-50%, -50%)",
   },
+  modalLoginSke: {
+    position: "absolute",
+    borderRadius: "10px",
+    backgroundColor: "#fff",
+    height: "50px",
+    zIndex: 1000,
+    width: "200px",
+    top: '10px',
+    right: "10px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+  },
   inputFile: {
     color: "red",
     backgroundColor: "#fff",
@@ -419,6 +497,12 @@ const style = {
   formStyle: {
     display: "flex",
     flexDirection: "column",
+  },
+  inputBase: {
+    color: 'red',
+    backgroundColor: 'lightgrey',
+    padding: '1px 5px',
+    borderRadius: '5px',
   },
   containerButoon: {
     display: "flex",

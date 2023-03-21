@@ -32,7 +32,7 @@ export const storage = getStorage(app);
 // }
 
 export async function uploadFile(file, onProgress) {
-  let extension = file.name.split(".").pop();
+  let extension = "glb";
   const storageRef = ref(storage, `3D/${v4()}.${extension}`);
   const uploadTask = uploadBytesResumable(storageRef, file);
 
