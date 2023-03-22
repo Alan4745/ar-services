@@ -76,28 +76,44 @@ const Model3D = (props) => {
     setSizeDb(sizeModel1);
   }, [props.upExp, size]);
 
+
+
   const scaleModel1 = 1 / Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
 
   const sizeModel1 =
     scaleModel1 * Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
 
-  const animate = () => {
-    mixer.update(clock.getDelta());
-    requestAnimationFrame(animate);
-  };
+  console.log(scaleModel1)
 
-  if (props.imgUp) {
-    console.log('subiendo la experiencia')
-  } else {
-    if (gltf.animations.length > 0) {
-      const action = mixer.clipAction(gltf.animations[0])
-      action.play()
+  // const animate = () => {
+  //   mixer.update(clock.getDelta());
+  //   requestAnimationFrame(animate);
+  // };
 
-      // start the animation loop
-      animate();
+  // if (props.imgUp) {
+  //   console.log('subiendo la experiencia')
+  // } else {
+  //   if (gltf.animations.length > 0) {
+  //     const action = mixer.clipAction(gltf.animations[0])
+  //     action.play()
 
-    }
-  }
+  //     // start the animation loop
+  //     animate();
+
+  //   }
+  // }
+
+  return (
+    <primitive
+      scale={scaleModel1}
+      object={gltf.scene}
+      onTouchStart={() => {
+        console.log("estamos dando toques al modelos 3d");
+      }}
+    />
+  )
+
+
 
 };
 
@@ -408,8 +424,46 @@ const Floor = () => {
 //   );
 // };
 
-const Viewer3D = () => {
 
+const SketchfabWeb = () => {
+
+  useEffect(() => {
+    const handleSumit = async () => {
+      setDisable(true);
+      setShowPorcet(true);
+      setImageUp(true)
+      console.log("subiendo archivo");
+      console.log(progress);
+
+
+      try {
+        const result = await uploadFile(test, setProgress);
+
+        console.log(result)
+
+        setUrlFile(result.url);
+        setPath(result.metaData.fullPath);
+        setProgress(0);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  }, []);
+
+
+  return (
+    <div className="skfb-widget" style={{ height: '100%', }} />
+  );
+
+}
+
+const Viewer3D = () => {
+  const [urlSketchab, setUrlSketchab] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [path, setPath] = useState(null);
+  const [urlfile, setUrlFile] = useState(
+    `${modelDefault}?timestamp=${Date.now()}`
+  );
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -427,17 +481,81 @@ const Viewer3D = () => {
         }
       });
     }
-
     return () => {
       document.body.removeChild(script);
     }
   }, []);
 
+  useEffect(() => {
+    console.log(urlSketchab, 'urlSketchab');
+    async function downloadModel(url) {
+      console.log('Downloading model...');
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.responseType = 'blob';
+
+      xhr.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
+          setProgress(percentComplete);
+        }
+      });
+
+      xhr.addEventListener('load', (event) => {
+        const blob = xhr.response;
+        console.log('Download complete!', blob);
+      });
+
+      xhr.send();
+    }
+
+    if (urlSketchab !== null) {
+      downloadModel(urlSketchab);
+    }
+  }, [urlSketchab]);
 
 
+
+
+  // useEffect(() => {
+  //   console.log(urlSketchab, 'urlSketchab');
+  //   async function name(url) {
+  //     console.log('estamos entrado en la url')
+
+
+  //     const response = await fetch(url)
+
+
+  //     const fileblob = await response.blob()
+
+  //     console.log(fileblob)
+  //   }
+
+  //   if (urlSketchab !== null) {
+  //     name(urlSketchab)
+  //   }
+  // }, [urlSketchab]);
 
   return (
-    <div className="skfb-widget" style={{ height: '100%' }} />
+    <>
+      {progress > 0 && (
+        <div >
+          Downloading model... {progress.toFixed(2)}% complete
+        </div>
+      )}
+      <SketchfabWeb />
+      <Canvas style={{ position: 'fixed', zIndex: -1 }}>
+        <Suspense fallback={null}>
+          <Model3D
+            model={urlfile}
+          />
+          {/* <Floor />
+          <OrbitControls ref={controlsRef} /> */}
+        </Suspense>
+      </Canvas>
+
+    </>
   );
 
 }
