@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable react-hooks/rules-of-hooks */
 
 import { Html, OrbitControls, useCursor, useProgress } from "@react-three/drei";
@@ -97,15 +98,7 @@ const Model3D = (props) => {
 
     }
   }
-  return (
-    <primitive
-      scale={scaleModel1}
-      object={gltf.scene}
-      onTouchStart={() => {
-        console.log("estamos dando toques al modelos 3d");
-      }}
-    />
-  );
+
 };
 
 const Loader = () => {
@@ -138,6 +131,7 @@ const Floor = () => {
 const Viewer3D = () => {
   const [file, setFile] = useState(null);
   const inputRef = createRef();
+  const navigate = useNavigate();
   const [disable, setDisable] = useState(false);
   const [urlfile, setUrlFile] = useState(
     `${modelDefault}?timestamp=${Date.now()}`
@@ -154,16 +148,57 @@ const Viewer3D = () => {
   const [upLoadExp, setupLoadExp] = useState(false);
   const [imageUp, setImageUp] = useState(false);
   const [urlSketchab, setUrlSketchab] = useState(null);
+  const [sizeDb, setSizeDb] = useState(1);
+  const [escaleDb, setEscaleDb] = useState(1);
+  const [rotacion, setRotacion] = useState([0, 0, 0]);
 
-  const handleSumit = async (e) => {
+  const gltf = useLoader(GLTFLoader, modelDefault)
+
+  // console.log(gltf);
+
+
+  const submitExpAr = async (url1, path1) => {
+
+
+    // let box = new THREE.Box3().setFromObject(gltf.scene)
+    // let size = new THREE.Vector3();
+    // box.getSize(size);
+
+    // const scaleModel1 = 1 / Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
+
+    // const sizeModel1 =
+    //   scaleModel1 * Math.max(sizeXYZ.sizeX, sizeXYZ.sizeY, sizeXYZ.sizeZ);
+
+    // console.log(scaleModel1, 'scaleModel1');
+
+    console.log("Estamos subiendo los datos a la base de datos");
+    console.log(urlfile);
+    console.log(path);
+    const result = await SaveModel3D(
+      url1,
+      path1,
+      sizeDb * 2,
+      escaleDb * 2,
+      rotacion[0],
+      rotacion[1],
+      rotacion[2]
+    );
+    console.log(result);
+    console.log(result.message._id);
+    // navigate(`/test/${result.message._id}`);
+  };
+
+  const handleSumit = async (test) => {
     setDisable(true);
     setShowPorcet(true);
     setImageUp(true)
-    e.preventDefault();
     console.log("subiendo archivo");
+    console.log(progress);
 
     try {
-      const result = await uploadFile(file, setProgress);
+      const result = await uploadFile(test, setProgress);
+
+      console.log(result)
 
       setUrlFile(result.url);
       setPath(result.metaData.fullPath);
@@ -171,109 +206,108 @@ const Viewer3D = () => {
       setSave(false);
       setShowPorcet(false);
       setImageUp(false)
+      submitExpAr(result.url, result.metaData.fullPath)
       setProgress(0);
-      handleReset();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const rebootSetting = async () => {
-    console.log("estamos reniciando las configuraciones");
-    // console.log(path);
+  // const rebootSetting = async () => {
+  //   console.log("estamos reniciando las configuraciones");
+  //   // console.log(path);
 
-    try {
-      const result = await deleteFile(path);
-      console.log(result);
-      setFile(null);
-      setDisable(false);
-      setReplay(true);
-      setSave(true);
-      inputRef.current.value = "";
-      handleReset();
-      setUrlFile(`${modelDefault}?timestamp=${Date.now()}`);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //   try {
+  //     const result = await deleteFile(path);
+  //     console.log(result);
+  //     setFile(null);
+  //     setDisable(false);
+  //     setReplay(true);
+  //     setSave(true);
+  //     inputRef.current.value = "";
+  //     handleReset();
+  //     setUrlFile(`${modelDefault}?timestamp=${Date.now()}`);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  const handleReset = () => {
-    const controls = controlsRef.current;
-    controls.reset();
-    controls.object.position.fromArray(initialPosition);
-    controls.update();
-  };
+  // const handleReset = () => {
+  //   const controls = controlsRef.current;
+  //   controls.reset();
+  //   controls.object.position.fromArray(initialPosition);
+  //   controls.update();
+  // };
 
 
   const CLIENT_ID = 'vagG6eINsnorKHmdlGd4iUbs2kiGvlULCKsclozk';
   const AUTHENTICATION_URL = `https://sketchfab.com/oauth2/authorize/?state=123456789&response_type=token&client_id=${CLIENT_ID}`;
 
-  function authenticate() {
-    window.open(AUTHENTICATION_URL, '_blank');
-  }
+  // function authenticate() {
+  //   window.open(AUTHENTICATION_URL, '_blank');
+  // }
 
-  async function getModelDownloadUrl(inputUrl) {
-    // Extract the model ID from the URL
-    const input = new URL(inputUrl);
-    // The ID is always the last string when seperating by '-'
-    const pieces = input.pathname.split('-');
-    const modelID = pieces[pieces.length - 1];
-    const token = localStorage.getItem('sketchfab_token');
+  // async function getModelDownloadUrl(inputUrl) {
+  //   // Extract the model ID from the URL
+  //   const input = new URL(inputUrl);
+  //   // The ID is always the last string when seperating by '-'
+  //   const pieces = input.pathname.split('-');
+  //   const modelID = pieces[pieces.length - 1];
+  //   const token = localStorage.getItem('sketchfab_token');
 
-    // console.log(modelID, 'modelID')
+  //   // console.log(modelID, 'modelID')
 
-    const metadataUrl = `https://api.sketchfab.com/v3/models/${modelID}/download`;
-    const options = {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      mode: 'cors'
-    };
+  //   const metadataUrl = `https://api.sketchfab.com/v3/models/${modelID}/download`;
+  //   const options = {
+  //     method: 'GET',
+  //     headers: {
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //     mode: 'cors'
+  //   };
 
-    // This call will fail if model can't be downloaded
-    const response = await fetch(metadataUrl, options);
-    // console.log(response);
-    const metadata = await response.json();
-    console.log(metadata.glb.url)
-    return metadata.glb.url;
-  }
+  //   // This call will fail if model can't be downloaded
+  //   const response = await fetch(metadataUrl, options);
+  //   // console.log(response);
+  //   const metadata = await response.json();
+  //   console.log(metadata.glb.url)
+  //   return metadata.glb.url;
+  // }
 
-  async function getFileUrl(file) {
-    const blob = await file.async('blob');
-    const url = URL.createObjectURL(blob);
-    return url;
-  }
+  // async function getFileUrl(file) {
+  //   const blob = await file.async('blob');
+  //   const url = URL.createObjectURL(blob);
+  //   return url;
+  // }
 
 
-  async function test(url1) {
-    const result = await getModelDownloadUrl(url1)
-    const response = await fetch(result)
+  // async function test(url1) {
+  //   const result = await getModelDownloadUrl(url1)
+  //   const response = await fetch(result)
 
-    const fileblob = await response.blob()
+  //   const fileblob = await response.blob()
 
-    console.log(fileblob)
+  //   console.log(fileblob)
 
-    try {
-      const result = await uploadFile(fileblob, setProgress);
+  //   try {
+  //     const result = await uploadFile(fileblob, setProgress);
 
-      setUrlFile(result.url);
-      setPath(result.metaData.fullPath);
-      setReplay(false);
-      setSave(false);
-      setShowPorcet(false);
-      setImageUp(false)
-      setProgress(0);
-      handleReset();
-    } catch (error) {
-      console.log(error);
-    }
+  //     setUrlFile(result.url);
+  //     setPath(result.metaData.fullPath);
+  //     setReplay(false);
+  //     setSave(false);
+  //     setShowPorcet(false);
+  //     setImageUp(false)
+  //     setProgress(0);
+  //     handleReset();
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
 
-  }
+  // }
 
   useEffect(() => {
-    test(urlSketchab)
-
+    test21(urlSketchab)
   }, [urlSketchab]);
 
   function getExtension(filename) {
@@ -329,112 +363,50 @@ const Viewer3D = () => {
 
   }
 
+  async function test21(url) {
+    if (url !== null) {
+      console.log(url)
+      const response = await fetch(url)
+
+
+      const fileblob = await response.blob()
+
+      console.log(fileblob)
+
+      handleSumit(fileblob)
+    }
+  }
+
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://apps.sketchfab.com/web-importer/sketchfab-importer.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      const el = document.querySelector('.skfb-widget');
+      const skfbWidget = new SketchfabImporter(el, {
+        onModelSelected: function (result) {
+          //Do something with the result
+          // console.log(result.download.glb.url);
+          setUrlSketchab(result.download.glb.url)
+        }
+      });
+    }
+
+    return () => {
+      document.body.removeChild(script);
+    }
+  }, []);
+
+
+
 
   return (
     <>
-      <div style={style.container}>
-        <Canvas camera={{ position: [1, 1.5, 1] }}>
-          {/* <Sky azimuth={1} inclination={0.6} distance={1000} /> */}
-          <ambientLight intensity={0.1} />
-
-          <directionalLight intensity={0.5} position={[0, 0.5, 2]} />
-          <directionalLight intensity={0.5} position={[-1, 0.5, 1]} />
-          <directionalLight intensity={0.5} position={[1, 0.5, 1]} />
-          <directionalLight intensity={0.5} position={[2, 0.5, 0]} />
-          <directionalLight intensity={0.5} position={[-2, 0.5, 0]} />
-          <directionalLight intensity={0.5} position={[0, 0.5, -2]} />
-          <directionalLight intensity={0.5} position={[1, 0.5, 1]} />
-          <directionalLight intensity={0.5} position={[-1, 0.5, -1]} />
-
-          <Suspense fallback={null}>
-            {/* <Model3d model={urlfile} size={size1} /> */}
-            <Model3D
-              model={urlfile}
-              path={path}
-              size={size1}
-              upExp={upLoadExp}
-              imgUp={imageUp}
-            />
-            <Floor />
-            <OrbitControls ref={controlsRef} />
-          </Suspense>
-        </Canvas>
-      </div>
-      <div style={style.modalFloat}>
-        {/* <p style={style.info}>currently only supports .glb files</p> */}
-        <form style={style.formStyle} onSubmit={handleSumit}>
-          <input
-            type="file"
-            style={style.inputFile}
-            ref={inputRef}
-            disabled={disable}
-            onChange={(e) => setFile(e.target.files[0])}
-          />
-          <Button
-            variant="contained"
-            type="submit"
-            size="small"
-            disabled={disable}
-            endIcon={<DriveFolderUploadIcon />}
-          >
-            {showPorcet ? (
-              <div style={{ color: "#FF0000" }}>
-                uploading {progress.toFixed(2)}%
-              </div>
-            ) : (
-              <> Upload File</>
-            )}
-          </Button>
-          <div style={style.containerButoon}>
-            <Button
-              disabled={replay}
-              variant="contained"
-              size="small"
-              color="error"
-              endIcon={<ReplayIcon />}
-              onClick={() => {
-                rebootSetting();
-              }}
-            >
-              Replay
-            </Button>
-            <Button
-              disabled={save}
-              variant="contained"
-              size="small"
-              color="success"
-              endIcon={<SaveIcon />}
-              onClick={() => {
-                setupLoadExp(true);
-              }}
-            >
-              Save
-            </Button>
-
-
-          </div>
-        </form>
-        <InputBase style={style.inputBase} size='medium' type='text' placeholder="ingresa al link" fullWidth={true}
-          onChange={(e) => { setUrlSketchab(e.target.value) }} />
-
-        {/* <Button onClick={() => { authenticate() }}>
-          login sketchfab
-        </Button> */}
-        {/* <input type='text' placeholder="model link" /> */}
-
-      </div>
-      <div style={style.modalLoginSke}>
-        <Button
-          variant="contained"
-          type="submit"
-          size="small"
-          onClick={() => { authenticate() }}>
-          login sketchfab
-        </Button>
-        {/* <input type='text' placeholder="model link" /> */}
-        {/* <InputBase style={style.inputBase} size='small' type='text' placeholder="ingresa al link" /> */}
-
-      </div>
+      <div className="skfb-widget" style={{ height: '100%' }} />
+      {/* <Model3D model={urlfile} /> */}
     </>
   );
 };
