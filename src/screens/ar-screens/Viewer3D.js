@@ -404,10 +404,7 @@ const Viewer3D = () => {
 
 
   return (
-    <>
-      <div className="skfb-widget" style={{ height: '100%' }} />
-      {/* <Model3D model={urlfile} /> */}
-    </>
+    <div className="skfb-widget" style={{ height: '100%' }} />
   );
 };
 
