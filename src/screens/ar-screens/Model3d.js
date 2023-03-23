@@ -72,7 +72,7 @@ function Model3d(props) {
     <primitive
       object={gltf.scene}
       scale={props.scale1}
-      rotation={[0, (180 * Math.PI) / 180, 0]}
+      rotation={[0, (180 * Math.PI) / 90, 0]}
     />
   );
 }

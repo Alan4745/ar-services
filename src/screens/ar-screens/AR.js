@@ -14,6 +14,8 @@ import { useSpring, animated } from "@react-spring/three";
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from 'three';
 import imgHost from '../../assets/hotspot.png'
+import { SpotLight } from "@react-three/drei";
+import { HemisphereLight } from "three";
 
 const Floor = () => {
   const floorRef = useRef();
@@ -31,6 +33,46 @@ const Floor = () => {
     </mesh>
   )
 }
+
+function Lights() {
+  return (
+    <group>
+      <ambientLight intensity={0.6} color="white" />
+      <directionalLight
+        castShadow
+        position={[-5, 5, -10]}
+        intensity={1}
+        shadow-bias={0.0001}
+        shadow-camera-right={4}
+        shadow-camera-left={-4}
+        shadow-camera-top={4}
+        shadow-camera-bottom={-4}
+        shadow-camera-near={0.1}
+        shadow-camera-far={50}
+        shadow-camera-radius={2}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
+      <directionalLight
+        castShadow
+        position={[5, 15, -10]}
+        intensity={1}
+        shadow-bias={0.0001}
+        shadow-camera-right={4}
+        shadow-camera-left={-4}
+        shadow-camera-top={4}
+        shadow-camera-bottom={-4}
+        shadow-camera-near={0.1}
+        shadow-camera-far={50}
+        shadow-camera-radius={2}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
+    </group>
+  )
+}
+
+
 
 function AR() {
   let { id } = useParams();
@@ -115,8 +157,28 @@ function AR() {
 
 
         </InstantTracker>
-        <directionalLight intensity={1.5} position={[-1, 0.5, -1]} />
-        <ambientLight intensity={1.5} />
+
+        <ambientLight />
+        <Lights />
+        <pointLight color={'white'} intensity={0.5} position={[2, 2, 2]} />
+        <pointLight color={'white'} intensity={0.5} position={[2, 2, -2]} />
+        <pointLight color={'white'} intensity={0.5} position={[2, -2, 2]} />
+        <pointLight color={'white'} intensity={0.5} position={[2, -2, -2]} />
+        <pointLight color={'white'} intensity={0.5} position={[-2, 2, 2]} />
+        <pointLight color={'white'} intensity={0.5} position={[-2, 2, -2]} />
+        <pointLight color={'white'} intensity={0.5} position={[-2, -2, 2]} />
+        <pointLight color={'white'} intensity={0.5} position={[-2, -2, -2]} />
+
+        {/* <directionalLight intensity={1} position={[-1, 0.25, 1]} />
+        <directionalLight intensity={1} position={[0, 0.25, 2]} />
+        <directionalLight intensity={1} position={[1, 0.5, 1]} />
+        <directionalLight intensity={1} position={[2, 0.25, 0]} />
+        <directionalLight intensity={1} position={[-2, 0.25, 0]} />
+        <directionalLight intensity={1} position={[0, 0.25, -2]} />
+        <directionalLight intensity={1} position={[1, 0.25, 1]} />
+        <directionalLight intensity={1} position={[-1, 0.25, -1]} />
+        <pointLight color={'white'} intensity={1} position={[0, 2, 0]} /> */}
+
       </ZapparCanvas>
       <div
         id="zappar-placement-ui"
