@@ -37,11 +37,11 @@ const Floor = () => {
 function Lights() {
   return (
     <group>
-      <ambientLight intensity={0.6} color="white" />
+      <ambientLight intensity={1} color="white" />
       <directionalLight
         castShadow
         position={[-5, 5, -10]}
-        intensity={1}
+        intensity={1.5}
         shadow-bias={0.0001}
         shadow-camera-right={4}
         shadow-camera-left={-4}
@@ -56,7 +56,37 @@ function Lights() {
       <directionalLight
         castShadow
         position={[5, 15, -10]}
-        intensity={1}
+        intensity={1.5}
+        shadow-bias={0.0001}
+        shadow-camera-right={4}
+        shadow-camera-left={-4}
+        shadow-camera-top={4}
+        shadow-camera-bottom={-4}
+        shadow-camera-near={0.1}
+        shadow-camera-far={50}
+        shadow-camera-radius={2}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
+      <directionalLight
+        castShadow
+        position={[5, 15, 10]}
+        intensity={1.5}
+        shadow-bias={0.0001}
+        shadow-camera-right={4}
+        shadow-camera-left={-4}
+        shadow-camera-top={4}
+        shadow-camera-bottom={-4}
+        shadow-camera-near={0.1}
+        shadow-camera-far={50}
+        shadow-camera-radius={2}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+      />
+      <directionalLight
+        castShadow
+        position={[5, 15, 10]}
+        intensity={1.5}
         shadow-bias={0.0001}
         shadow-camera-right={4}
         shadow-camera-left={-4}
