@@ -28,7 +28,7 @@ const Floor = () => {
   const texture = useMemo(() => new THREE.TextureLoader().load(imgHost), [imgHost]);
 
   return (
-    <mesh ref={floorRef} rotation={[(90 * Math.PI) / 90, 0, 0]}>
+    <mesh ref={floorRef} rotation={[-Math.PI / 2, 0, 0]}>
       <planeBufferGeometry attach="geometry" args={[3, 3]} />
       <meshStandardMaterial attach="material" map={texture} transparent={true} />
     </mesh>
