@@ -28,9 +28,9 @@ const Floor = () => {
   const texture = useMemo(() => new THREE.TextureLoader().load(imgHost), [imgHost]);
 
   return (
-    <mesh ref={floorRef} rotation={[(180 * Math.PI) / 90, 0, 0]}>
-      <planeBufferGeometry attach="geometry" args={[1, 1]} />
-      <meshStandardMaterial attach="material" map={texture} />
+    <mesh ref={floorRef} rotation={[(90 * Math.PI) / 90, 0, 0]}>
+      <planeBufferGeometry attach="geometry" args={[3, 3]} />
+      <meshStandardMaterial attach="material" map={texture} transparent={true} />
     </mesh>
   )
 }
@@ -100,22 +100,6 @@ function Lights() {
         shadow-mapSize-height={1024}
       />
     </group>
-  )
-}
-
-function ImagePlane() {
-  const imagePlaneRef = useRef();
-
-  // const texture = useMemo(() => new THREE.TextureLoader().load(gifScan), [gifScan])
-  const texture = new TextureLoader().load(gifScan);
-  texture.wrapS = RepeatWrapping;
-  texture.wrapT = RepeatWrapping;
-  texture.repeat.set(1, 1);
-  return (
-    <mesh ref={imagePlaneRef} rotation={[(180 * Math.PI) / 90, 0, 0]}>
-      <planeBufferGeometry attach="geometry" args={[3, 3]} />
-      <meshStandardMaterial attach="material" map={texture} transparent={true} />
-    </mesh>
   )
 }
 
@@ -217,7 +201,8 @@ function AR() {
                   scale1={zoom} />
 
               ) : null}
-              <Floor />
+              {placementMode ? <Floor /> : null}
+
             </Suspense>
           )}
 
@@ -255,8 +240,9 @@ function AR() {
         the object
       </div>
       {showGif && (
-        <div style={{ position: 'absolute', top: 0, height: '100%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <img src={gifScan} style={{ maxWidth: '100%', height: 'auto' }} />
+        <div style={style.divgifs}>
+          <h1 style={style.title}>Scan a flat surface with your device</h1>
+          <img src={gifScan} style={style.imgGifs} />
         </div>
       )}
     </>
@@ -278,7 +264,24 @@ const style = {
     borderRadius: '5px',
     position: "absolute",
   },
-
+  divgifs: {
+    position: 'absolute',
+    top: 0,
+    height: '100%',
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column'
+  },
+  imgGifs: {
+    maxWidth: '100%', height: 'auto'
+  },
+  title: {
+    color: '#FFF',
+    textAlign: 'center',
+    top: '10px',
+  }
 };
 
 
