@@ -14,8 +14,9 @@ import { useSpring, animated } from "@react-spring/three";
 import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from 'three';
 import imgHost from '../../assets/hotspot.png'
-import { SpotLight } from "@react-three/drei";
-import { HemisphereLight } from "three";
+import gifScan from '../../assets/scan.gif'
+import { Image, SpotLight } from "@react-three/drei";
+import { HemisphereLight, RepeatWrapping, TextureLoader } from "three";
 
 const Floor = () => {
   const floorRef = useRef();
@@ -27,9 +28,9 @@ const Floor = () => {
   const texture = useMemo(() => new THREE.TextureLoader().load(imgHost), [imgHost]);
 
   return (
-    <mesh ref={floorRef} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeBufferGeometry attach="geometry" args={[3, 3]} />
-      <meshStandardMaterial attach="material" map={texture} transparent={true} />
+    <mesh ref={floorRef} rotation={[(180 * Math.PI) / 90, 0, 0]}>
+      <planeBufferGeometry attach="geometry" args={[1, 1]} />
+      <meshStandardMaterial attach="material" map={texture} />
     </mesh>
   )
 }
@@ -102,12 +103,27 @@ function Lights() {
   )
 }
 
+function ImagePlane() {
+  const imagePlaneRef = useRef();
 
+  // const texture = useMemo(() => new THREE.TextureLoader().load(gifScan), [gifScan])
+  const texture = new TextureLoader().load(gifScan);
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.repeat.set(1, 1);
+  return (
+    <mesh ref={imagePlaneRef} rotation={[(180 * Math.PI) / 90, 0, 0]}>
+      <planeBufferGeometry attach="geometry" args={[3, 3]} />
+      <meshStandardMaterial attach="material" map={texture} transparent={true} />
+    </mesh>
+  )
+}
 
 function AR() {
   let { id } = useParams();
   const [configAr, setConfigAr] = useState({});
   const [out, setOut] = useState(false);
+  const [showGif, setShowGif] = useState(true);
   // const colorMap = useLoader(TextureLoader, imgHost)
 
   useEffect(() => {
@@ -127,12 +143,16 @@ function AR() {
   useEffect(() => {
     // setZoom());
     console.log(configAr.scaleModel);
+
+
     return () => {
       if (camera.current) {
         camera.current.stop();
       }
     };
   }, []);
+
+
 
   function NoZoom() {
     useEffect(() => {
@@ -169,26 +189,42 @@ function AR() {
     },
   });
 
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowGif(false);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
   return (
     <>
       <ZapparCanvas>
         <ZapparCamera ref={camera} />
-        <InstantTracker placementMode={placementMode} placementCameraOffset={[0, 0, -5]}>
-          <Suspense fallback={null}>
-            {configAr.urlModel !== undefined ? (
-              <Model3d
-                model={configAr.urlModel}
-                size={configAr.sizeModel}
-                scale1={zoom} />
 
-            ) : null}
-            <Floor />
-          </Suspense>
+
+
+        <InstantTracker placementMode={placementMode} placementCameraOffset={[0, 0, -5]}>
+
+          {!showGif && (
+            <Suspense fallback={null}>
+              {configAr.urlModel !== undefined ? (
+                <Model3d
+                  model={configAr.urlModel}
+                  size={configAr.sizeModel}
+                  scale1={zoom} />
+
+              ) : null}
+              <Floor />
+            </Suspense>
+          )}
+
 
 
         </InstantTracker>
 
-        <ambientLight />
         <Lights />
         <pointLight color={'white'} intensity={0.5} position={[2, 2, 2]} />
         <pointLight color={'white'} intensity={0.5} position={[2, 2, -2]} />
@@ -199,15 +235,7 @@ function AR() {
         <pointLight color={'white'} intensity={0.5} position={[-2, -2, 2]} />
         <pointLight color={'white'} intensity={0.5} position={[-2, -2, -2]} />
 
-        {/* <directionalLight intensity={1} position={[-1, 0.25, 1]} />
-        <directionalLight intensity={1} position={[0, 0.25, 2]} />
-        <directionalLight intensity={1} position={[1, 0.5, 1]} />
-        <directionalLight intensity={1} position={[2, 0.25, 0]} />
-        <directionalLight intensity={1} position={[-2, 0.25, 0]} />
-        <directionalLight intensity={1} position={[0, 0.25, -2]} />
-        <directionalLight intensity={1} position={[1, 0.25, 1]} />
-        <directionalLight intensity={1} position={[-1, 0.25, -1]} />
-        <pointLight color={'white'} intensity={1} position={[0, 2, 0]} /> */}
+        <ambientLight />
 
       </ZapparCanvas>
       <div
@@ -226,6 +254,11 @@ function AR() {
         {placementMode ? ' place ' : ' pick up '}
         the object
       </div>
+      {showGif && (
+        <div style={{ position: 'absolute', top: 0, height: '100%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <img src={gifScan} style={{ maxWidth: '100%', height: 'auto' }} />
+        </div>
+      )}
     </>
   );
 }
@@ -245,6 +278,7 @@ const style = {
     borderRadius: '5px',
     position: "absolute",
   },
+
 };
 
 
