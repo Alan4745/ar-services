@@ -210,12 +210,12 @@ function AR() {
 
         </InstantTracker>
 
-        <Lights />
-        <pointLight color={'white'} intensity={0.5} position={[2, 2, 2]} />
-        <pointLight color={'white'} intensity={0.5} position={[2, 2, -2]} />
+        {/* <Lights /> */}
+        <pointLight color={'white'} intensity={1} position={[2, 2, 2]} />
+        <pointLight color={'white'} intensity={1} position={[2, 2, -2]} />
         <pointLight color={'white'} intensity={0.5} position={[2, -2, 2]} />
         <pointLight color={'white'} intensity={0.5} position={[2, -2, -2]} />
-        <pointLight color={'white'} intensity={0.5} position={[-2, 2, 2]} />
+        <pointLight color={'red'} intensity={0.5} position={[-2, 2, 2]} />
         <pointLight color={'white'} intensity={0.5} position={[-2, 2, -2]} />
         <pointLight color={'white'} intensity={0.5} position={[-2, -2, 2]} />
         <pointLight color={'white'} intensity={0.5} position={[-2, -2, -2]} />
